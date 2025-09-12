@@ -26,6 +26,10 @@ vim.diagnostic.config({
     header = "",
   },
 })
+local opts = { noremap = true, silent = true, nowait = true }
+vim.keymap.set("n", "<leader>le", function()
+  vim.diagnostic.setqflist({ severity = { min = "ERROR" } })
+end, opts)
 
 -- Add cmp_nvim_lsp capabilities settings to lspconfig
 -- This should be executed before you configure any language server
@@ -93,7 +97,8 @@ require("mason-lspconfig").setup({
           "--add-opens=java.base/java.io=ALL-UNNAMED",
           "--add-opens=java.base/java.util=ALL-UNNAMED",
           "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
-          "-jar", vim.fn.glob(vim.fn.stdpath("data") .. "/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
+          "-jar", vim.fn.glob(vim.fn.stdpath("data") ..
+          "/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
           "-configuration", vim.fn.stdpath("data") .. "/mason/packages/jdtls/config_mac",
           "-data", vim.fn.stdpath("cache") .. "/jdtls/workspace"
         },
@@ -201,15 +206,15 @@ lspconfig.efm.setup {
     return lspconfig.util.root_pattern('.prettierrc', '.prettierrc.js', '.git')(fname) or vim.loop.cwd()
   end,
   settings = {
-    rootMarkers = {".prettierrc", ".prettierrc.js", "dprint.json"},
+    rootMarkers = { ".prettierrc", ".prettierrc.js", "dprint.json" },
     languages = {
-      javascript = {web_formatter},
-      typescript = {web_formatter},
-      javascriptreact = {web_formatter},
-      typescriptreact = {web_formatter},
-      html = {web_formatter},
-      markdown = {web_formatter},
-      json = {web_formatter},
+      javascript = { web_formatter },
+      typescript = { web_formatter },
+      javascriptreact = { web_formatter },
+      typescriptreact = { web_formatter },
+      html = { web_formatter },
+      markdown = { web_formatter },
+      json = { web_formatter },
     },
   },
   filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
@@ -232,7 +237,7 @@ local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter.te
 if ts_repeat_move_status then
   -- Register the diagnostic navigation functions with repeatable_move
   local next_diagnostic, prev_diagnostic = ts_repeat_move.make_repeatable_move_pair(
-    -- maybe set severity to min = WARN.
+  -- maybe set severity to min = WARN.
     function()
       vim.diagnostic.jump({ count = 1, float = false })
     end,
