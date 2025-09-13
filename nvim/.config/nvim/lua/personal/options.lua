@@ -18,10 +18,18 @@ vim.opt.softtabstop    = 2
 vim.opt.shiftwidth     = 2
 vim.opt.expandtab      = true -- expand tabs to spaces
 
+-- Diff
+vim.opt.diffopt:append({
+  "algorithm:patience", -- or "algorithm:histogram"
+  "indent-heuristic",
+  "linematch:60",
+  "context:10"
+})
+
 -- UI settings
-vim.opt.mouse          = "a" -- Use mouse
-vim.opt.list           = true
-vim.opt.listchars      = {
+vim.opt.mouse      = "a"     -- Use mouse
+vim.opt.list       = true
+vim.opt.listchars  = {
   tab = "> ",
   trail = "~",
   nbsp = "+",
@@ -29,7 +37,7 @@ vim.opt.listchars      = {
 }
 
 -- Performance settings
-vim.opt.updatetime     = 500 -- Default 4000, time for plugin to update
+vim.opt.updatetime = 500     -- Default 4000, time for plugin to update
 
 -- Git conflict highlighting
 vim.cmd([[
