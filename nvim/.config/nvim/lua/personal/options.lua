@@ -27,7 +27,7 @@ vim.opt.diffopt:append({
 })
 
 -- UI settings
-vim.opt.mouse      = "a"     -- Use mouse
+vim.opt.mouse      = "a" -- Use mouse
 vim.opt.list       = true
 vim.opt.listchars  = {
   tab = "> ",
@@ -37,7 +37,13 @@ vim.opt.listchars  = {
 }
 
 -- Performance settings
-vim.opt.updatetime = 500     -- Default 4000, time for plugin to update
+vim.opt.updatetime = 500 -- Default 4000, time for plugin to update
+
+-- Fold settings
+vim.opt.foldmethod = 'expr'
+vim.opt.foldlevel  = 99
+vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext   = ""
 
 -- Git conflict highlighting
 vim.cmd([[
