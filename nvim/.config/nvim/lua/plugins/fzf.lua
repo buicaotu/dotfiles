@@ -114,6 +114,9 @@ return {
       vim.cmd.FzfLua('buffers')
     end, opts)
     vim.keymap.set("n", "<leader>p", vim.cmd.FzfLua, opts)
+    vim.keymap.set("n", "<leader>lf", function()
+      vim.cmd.FzfLua('quickfix')
+    end, opts)
 
     -- todo: grep selected word/word under cursor within current folder
 
