@@ -14,11 +14,16 @@ vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 
 -- window
 vim.keymap.set('n', '<Tab>', '<C-^>', opts)
+
+-- Terminal
+-- Paste from registers in terminal mode: <C-r> then register name (e.g., <C-r>+ for clipboard)
 vim.keymap.set('t', '<c-r>', function()
   local next_char_code = vim.fn.getchar()
   local next_char = vim.fn.nr2char(next_char_code)
   return '<C-\\><C-N>"' .. next_char .. 'pi'
 end, { expr = true })
+-- Terminal mode insert exit
+vim.keymap.set('t', '<C-]>', '<C-\\><C-N>', opts)
 
 -- Close current window, do nothing if it's the last window
 vim.api.nvim_set_keymap('n', '<leader>q', ':lua if #vim.api.nvim_list_wins() > 1 then vim.cmd("q") end<CR>',

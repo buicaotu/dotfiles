@@ -43,7 +43,6 @@ return {
       win = {
         keys = {
           term_normal = {
-            -- "<Char-0xAF>",
             "<C-]>",
             function(self)
               vim.cmd("stopinsert")
