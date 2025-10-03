@@ -21,8 +21,8 @@
   m  = merge
   cp = cherry-pick
   cm = commit
-  co = "! git fetch origin refs/heads/$1 && git checkout -q FETCH_HEAD && git switch --force-create $1 #" # checkout the latest and match local branch to it
-  cg = "! git fetch origin refs/heads/green && git checkout -q FETCH_HEAD && git checkout -b $1 #" # create a new branch off green
+  co = "! git fetch origin refs/heads/$1 && git switch -q -C $1 FETCH_HEAD #" # checkout the latest and match local branch to it
+  cg = "! git fetch origin refs/heads/green && git switch -q -C $1 FETCH_HEAD #" # create a new branch off green
   pf = "! git push --force-with-lease #" # push force
   pu = "! git push -u #" # push upstream with default (default is current see push config below)
   l  = "! git log --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' $@ #" # log <commit> <date> <name> <comment>
