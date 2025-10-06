@@ -1,3 +1,9 @@
+-- a function to check if the current buffer is in a float window
+local function is_floating_window()
+  local win_config = vim.api.nvim_win_get_config(0)
+  return win_config.relative ~= ''
+end
+
 return {
   "stevearc/oil.nvim",
   opts = {
@@ -19,7 +25,7 @@ return {
     vim.api.nvim_create_user_command("OilGrep", function(opts)
       local oil = require("oil");
       local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
-      if vim.bo.filetype == "oil" then
+      if vim.bo.filetype == "oil" and is_floating_window() then
         oil.close()
       end
       require("personal.command_palette").grep(dir, opts.fargs[1])
@@ -47,7 +53,7 @@ return {
     -- Redefine 'Browse' as oil.nvim disable netrw
     vim.api.nvim_create_user_command(
       'Browse',
-      function (o)
+      function(o)
         vim.fn.system { 'open', o.fargs[1] }
       end,
       { nargs = 1 }
@@ -59,8 +65,8 @@ return {
         local file = vim.fn.expand("<cWORD>")
         -- open(macos) || xdg-open(linux)
         if
-          string.match(file, "https") == "https"
-          or string.match(file, "http") == "http"
+            string.match(file, "https") == "https"
+            or string.match(file, "http") == "http"
         then
           vim.fn.system { 'open', file }
         else

@@ -126,7 +126,11 @@ return {
     -- Create :Rg command for searching
     vim.api.nvim_create_user_command("Rg", function(opts)
       local search_text = table.concat(opts.fargs, " ")
+      if vim.bo.filetype == "oil" then
+        vim.cmd.OilGrep(search_text)
+      else
       require("personal.command_palette").grep(vim.fn.getcwd(), search_text)
+      end
     end, { nargs = "*" })
 
     -- Create :Rf command for searching in quickfix files
