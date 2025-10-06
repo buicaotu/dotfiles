@@ -1,13 +1,12 @@
--- Function to get all files from the quickfix list (only in working directory with relative paths)
-local function get_quickfix_files()
+-- Function to get all files from open buffers
+local function get_buffer_files()
   local files = {}
-  local qf_items = vim.fn.getqflist()
+  local buffers = vim.api.nvim_list_bufs()
 
-  for _, item in ipairs(qf_items) do
-    local bufnr = item.bufnr
-    if bufnr > 0 then
+  for _, bufnr in ipairs(buffers) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buftype == '' then
       local file_path = vim.api.nvim_buf_get_name(bufnr)
-      if not files[file_path] then
+      if file_path ~= '' and not files[file_path] then
         files[file_path] = true
       end
     end
@@ -19,29 +18,6 @@ local function get_quickfix_files()
   end
 
   return file_list
-end
-
--- Function to perform grep on quickfix files
-local function grep_qf(search)
-  -- Get files from quickfix list
-  local qf_files = get_quickfix_files()
-
-  if #qf_files == 0 then
-    vim.notify("Quickfix list is empty or contains no valid files", vim.log.levels.WARN)
-    return
-  end
-
-  -- Join file patterns with a space
-  local file_arg = table.concat(qf_files, " ")
-
-  -- Add iglob filters directly to the search string
-  require("fzf-lua").grep({
-    search = search,
-    input_prompt = 'Grep in quickfix files ❯ ',
-    filespec = file_arg,
-    -- adding "--with-filename" to the default grep rg_opts
-    rg_opts = "--column --line-number --no-heading --with-filename --color=always --smart-case --max-columns=4096 -e"
-  })
 end
 
 return {
@@ -69,8 +45,10 @@ return {
     },
     grep = {
       rg_glob = true,
-      glob_flag = "--iglob",    -- for case sensitive globs use '--glob'
-      glob_separator = "%s%-%-" -- query separator pattern (lua): ' --'
+      glob_flag = "--iglob",     -- for case sensitive globs use '--glob'
+      glob_separator = "%s%-%-", -- query separator pattern (lua): ' --'
+      -- adding "--with-filename" to the default grep rg_opts
+      rg_opts = "--column --line-number --no-heading --with-filename --color=always --smart-case --max-columns=4096 -e"
     }
   },
   init = function()
@@ -106,6 +84,17 @@ return {
       vim.cmd.Rf(selected_text)
     end, opts)
 
+    -- grep word under cursor in buffer files
+    vim.keymap.set("n", "<leader>rb", function()
+      vim.cmd.Rb(vim.fn.expand("<cword>"))
+    end, opts)
+
+    -- grep visual selected in buffer files
+    vim.keymap.set("v", "<leader>rb", function()
+      local selected_text = require("fzf-lua.utils").get_visual_selection()
+      vim.cmd.Rb(selected_text)
+    end, opts)
+
     -- FZF keymaps
     vim.keymap.set("n", "<leader>s", function()
       vim.cmd.FzfLua('files')
@@ -129,14 +118,35 @@ return {
       if vim.bo.filetype == "oil" then
         vim.cmd.OilGrep(search_text)
       else
-      require("personal.command_palette").grep(vim.fn.getcwd(), search_text)
+        require("personal.command_palette").grep(vim.fn.getcwd(), search_text)
       end
     end, { nargs = "*" })
 
     -- Create :Rf command for searching in quickfix files
     vim.api.nvim_create_user_command("Rf", function(opts)
       local search_text = table.concat(opts.fargs, " ")
-      grep_qf(search_text)
+      require("fzf-lua").grep_quickfix({
+        search = search_text,
+        input_prompt = 'Grep in quickfix files ❯ ',
+      })
+    end, { nargs = "*" })
+
+    -- Create :Rb command for searching in buffer files
+    vim.api.nvim_create_user_command("Rb", function(opts)
+      local search_text = table.concat(opts.fargs, " ")
+      -- Get files from open buffers
+      local buffer_files = get_buffer_files()
+
+      if #buffer_files == 0 then
+        vim.notify("No valid buffer files found", vim.log.levels.WARN)
+        return
+      end
+
+      require("fzf-lua").grep({
+        search = search_text,
+        input_prompt = 'Grep in buffer files ❯ ',
+        search_paths = buffer_files,
+      })
     end, { nargs = "*" })
   end
 }
