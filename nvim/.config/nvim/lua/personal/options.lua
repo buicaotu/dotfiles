@@ -7,6 +7,7 @@ vim.opt.incsearch      = true -- highlight search term incrementally
 vim.opt.grepprg        = "rg --vimgrep --follow"
 vim.opt.grepformat     = "%f:%l:%c:%m"
 vim.opt.laststatus     = 3
+vim.opt.splitright     = true
 
 -- Search settings
 vim.opt.ignorecase     = true -- Search ignore case by default
