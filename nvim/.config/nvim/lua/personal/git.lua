@@ -113,20 +113,35 @@ end, opts)
 vim.keymap.set("n", "<leader>dG", ':DiffGreen<CR>', opts)
 
 -- diff against current working directory
-vim.keymap.set("n", "<leader>ds", vim.cmd.Gvdiffsplit, opts)
+vim.keymap.set("n", "<leader>ds", function()
+  vim.cmd("Gvdiffsplit!")
+end, opts)
 vim.keymap.set("n", "<leader>dS", function()
-  vim.cmd('Gvdiffsplit @')
+  vim.cmd("Gvdiffsplit! @")
 end, opts)
 -- diff against a specific commit
 vim.keymap.set("n", "<leader>DS", function()
   local commit = vim.fn.input("Commit: ")
   if commit ~= "" then
-    vim.cmd('Gvdiffsplit ' .. commit)
+    vim.cmd('Gvdiffsplit! ' .. commit)
   end
 end, opts)
 -- diff against the stored commit from (Dt)
 vim.keymap.set('n', '<leader>dg', function()
-  vim.cmd('Gvdiffsplit ' .. current_commit .. ':%')
+  vim.cmd('Gvdiffsplit! ' .. current_commit .. ':%')
 end, opts)
 
 vim.keymap.set("n", "<leader>mt", ':G mergetool <CR>', opts)
+
+local function close_all_fugitive_diff_windows()
+  -- find and close fugitive diff windows
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local bufname = vim.api.nvim_buf_get_name(buf)
+    -- Only close if it's a fugitive buffer
+    if bufname:match("fugitive://") then
+      vim.api.nvim_win_close(win, false)
+    end
+  end
+end
+vim.keymap.set('n', '<leader>dc', close_all_fugitive_diff_windows, { desc = 'Close fugitive diff windows' })
