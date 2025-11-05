@@ -25,7 +25,7 @@ aliases:
         "
     # prc: pr create --body ""
     # create the PR with the last commit message as the title
-    prc: '!gh pr create --title "$(git log -1 --pretty=%B)" --body ""'
+    prc: '!gh pr create --title "$(git log -1 --pretty=%B)" --body "" "$@"'
     prv: pr view --web
 # The path to a unix socket through which send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
 http_unix_socket:
