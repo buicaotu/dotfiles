@@ -135,12 +135,18 @@ vim.keymap.set("n", "<leader>mt", ':G mergetool <CR>', opts)
 
 local function close_all_fugitive_diff_windows()
   -- find and close fugitive diff windows
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+  local wins = vim.api.nvim_tabpage_list_wins(0)
+  for _, win in ipairs(wins) do
     local buf = vim.api.nvim_win_get_buf(win)
     local bufname = vim.api.nvim_buf_get_name(buf)
     -- Only close if it's a fugitive buffer
     if bufname:match("fugitive://") then
-      vim.api.nvim_win_close(win, false)
+      -- If it's the last window, close the buffer instead
+      if #wins == 1 then
+        vim.api.nvim_buf_delete(buf, { force = false })
+      else
+        vim.api.nvim_win_close(win, false)
+      end
     end
   end
 end
