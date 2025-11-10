@@ -3,6 +3,7 @@ return {
   { 'neovim/nvim-lspconfig' },
   { 'williamboman/mason.nvim' },
   { 'williamboman/mason-lspconfig.nvim' },
+
   -- Autocompletion
   { "lukas-reineke/lsp-format.nvim" },
   { "github/copilot.vim" },
@@ -60,12 +61,23 @@ return {
   { "tpope/vim-dispatch" },
 
   -- UI
-  { 'j-hui/fidget.nvim',                          opts = {} },
-  { 'echasnovski/mini.move',                      version = false, opts = {} },
+  { 'j-hui/fidget.nvim',     opts = {} },
+  { 'echasnovski/mini.move', version = false, opts = {} },
+
+  -- Editing
+  { "tpope/vim-surround" },
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = true
+
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    config = true
+  },
 
   -- Misc
-  { "tpope/vim-surround" },
-  { 'cohama/lexima.vim' },
   { 'nvim-lua/plenary.nvim' },
   { 'christoomey/vim-tmux-navigator' },
   { 'rhysd/conflict-marker.vim' },
