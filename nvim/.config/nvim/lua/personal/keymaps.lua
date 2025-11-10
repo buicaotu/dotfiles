@@ -24,6 +24,8 @@ vim.keymap.set('t', '<c-r>', function()
 end, { expr = true })
 -- Terminal mode insert exit
 vim.keymap.set('t', '<C-]>', '<C-\\><C-N>', opts)
+-- ALT-R sends CTRL-R to the terminal (triggers fzf)
+vim.keymap.set('t', '<M-r>', '<C-r>', opts)
 
 -- Close current window, do nothing if it's the last window
 vim.api.nvim_set_keymap('n', '<leader>q', ':lua if #vim.api.nvim_list_wins() > 1 then vim.cmd("q") end<CR>',
