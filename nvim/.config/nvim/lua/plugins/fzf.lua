@@ -26,6 +26,18 @@ local function is_floating_window()
   return win_config.relative ~= ''
 end
 
+-- Grep function that handles searching with fzf-lua
+-- @param opts Command options (from vim.api.nvim_create_user_command)
+--   - opts.range: >0 if called from visual mode
+--   - opts.fargs: command arguments array
+-- @param grep_opts Grep-specific options
+--   - grep_opts.no_esc: if true, disables escaping of special characters in search pattern
+-- Behavior:
+--   - In oil buffers: searches within the current directory, closes floating oil window if open,
+--     and adds the command to command history
+--   - In regular buffers: uses fzf-lua's grep function directly
+--   - Visual mode: searches for selected text
+--   - Normal mode: searches for command arguments
 local function grep(opts, grep_opts)
   local search_text
   if opts.range > 0 then
