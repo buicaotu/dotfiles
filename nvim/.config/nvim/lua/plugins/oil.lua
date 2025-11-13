@@ -42,13 +42,19 @@ return {
     end, {})
 
 
-    local opts = { noremap = true, silent = true, nowait = true }
-    -- Open file explorer
-    vim.keymap.set("n", "<C-n>", function()
-      require("oil").toggle_float()
-    end, opts)
-    -- OilFiles keymap
-    vim.keymap.set("n", "<leader>of", ":OilFiles<CR>", opts)
+    local wk = require("which-key")
+    wk.add({
+      {
+        "<C-n>",
+        function()
+          require("oil").toggle_float()
+        end,
+        desc = "Toggle Oil file explorer",
+        mode = "n",
+      },
+      { "<leader>o", group = "Oil" },
+      { "<leader>of", ":OilFiles<CR>", desc = "Oil files", mode = "n" },
+    })
 
     -- Redefine 'Browse' as oil.nvim disable netrw
     vim.api.nvim_create_user_command(
@@ -75,6 +81,8 @@ return {
       end
     end
     local open = openUrl()
-    vim.keymap.set("n", "gx", open, { desc = "Open url under current word" })
+    wk.add({
+      { "gx", open, desc = "Open URL under cursor", mode = "n" },
+    })
   end
 }

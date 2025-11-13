@@ -1,96 +1,129 @@
-local opts = { noremap = true, silent = true, nowait = true }
+local wk = require("which-key")
 
--- Shorten function name
-local keymap = vim.api.nvim_set_keymap
+wk.add({
+  -- Visual mode mappings
+  { "p",         '"_dP',  desc = "Paste without yank",     mode = "v" },
 
--- leader key
-vim.g.mapleader = ' '
+  -- Clipboard
+  { "<leader>y", '"+y',   desc = "Yank to clipboard",      mode = { "n", "v" } },
 
--- Replace without yank
-keymap("v", "p", '"_dP', opts)
+  -- Window navigation
+  { "<Tab>",     "<C-^>", desc = "Toggle between buffers", mode = "n" },
 
--- clipboard
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
+  -- Terminal mappings
+  {
+    "<c-r>",
+    function()
+      local next_char_code = vim.fn.getchar()
+      local next_char = vim.fn.nr2char(next_char_code)
+      return '<C-\\><C-N>"' .. next_char .. 'pi'
+    end,
+    desc = "Paste from register in terminal",
+    mode = "t",
+    expr = true,
+  },
+  { "<C-]>", "<C-\\><C-N>", desc = "Exit terminal mode",      mode = "t" },
+  { "<M-r>", "<C-r>",       desc = "Send Ctrl-R to terminal", mode = "t" },
 
--- window
-vim.keymap.set('n', '<Tab>', '<C-^>', opts)
+  -- Window management
+  {
+    "<leader>q",
+    function()
+      if #vim.api.nvim_list_wins() > 1 then
+        vim.cmd("q")
+      end
+    end,
+    desc = "Close window",
+    mode = "n",
+  },
 
--- Terminal
--- Paste from registers in terminal mode: <C-r> then register name (e.g., <C-r>+ for clipboard)
-vim.keymap.set('t', '<c-r>', function()
-  local next_char_code = vim.fn.getchar()
-  local next_char = vim.fn.nr2char(next_char_code)
-  return '<C-\\><C-N>"' .. next_char .. 'pi'
-end, { expr = true })
--- Terminal mode insert exit
-vim.keymap.set('t', '<C-]>', '<C-\\><C-N>', opts)
--- ALT-R sends CTRL-R to the terminal (triggers fzf)
-vim.keymap.set('t', '<M-r>', '<C-r>', opts)
+  -- Buffer management
+  { "<leader>x", ":bn|bd#<CR>",  desc = "Delete buffer (keep window)", mode = "n" },
+  { "<leader>X", ":bn|bd#!<CR>", desc = "Delete buffer! (force)",      mode = "n" },
 
--- Close current window, do nothing if it's the last window
-vim.api.nvim_set_keymap('n', '<leader>q', ':lua if #vim.api.nvim_list_wins() > 1 then vim.cmd("q") end<CR>',
-  { noremap = true, silent = true })
+  -- LSP Inlay hints
+  {
+    "<leader>h",
+    function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    end,
+    desc = "Toggle inlay hints",
+    mode = "n",
+  },
 
--- buffer
-vim.keymap.set('n', '<leader>x', ':bn|bd#<CR>', opts)
-vim.keymap.set('n', '<leader>X', ':bn|bd#!<CR>', opts)
+  -- Copilot
+  { "<C-J>",     'copilot#Accept("\\<CR>")', desc = "Accept Copilot suggestion", mode = "i", expr = true, replace_keycodes = false },
 
-vim.keymap.set('n', '<leader>h', function()
-  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-end, opts)
+  -- Avante
+  { "<leader>a", group = "Avante" },
+  {
+    "<leader>aa",
+    function()
+      require("avante.api").ask()
+    end,
+    desc = "Ask Avante",
+    mode = { "n", "v" },
+  },
+  {
+    "<leader>ar",
+    function()
+      require("avante.api").refresh()
+    end,
+    desc = "Refresh Avante",
+    mode = "v",
+  },
+  {
+    "<leader>ae",
+    function()
+      require("avante.api").edit()
+    end,
+    desc = "Edit with Avante",
+    mode = { "n", "v" },
+  },
 
--- Copilot
--- Unmapping the default keybindings (Tab) for Copilot to avoid conflicts
-vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  replace_keycodes = false
+  -- Special characters from wezterm
+  { "<Char-0xAA>", "<cmd>write<cr>",      desc = "Save file",            mode = "n" },
+  { "<Char-0xAB>", 'y<cmd>let @+=@0<CR>', desc = "Copy to clipboard",    mode = "v" },
+  { "<Char-0xAD>", ':norm "+p',           desc = "Paste from clipboard", mode = { "n", "i" } },
+
+  -- Option+Arrow key mappings
+  { "<Char-0xB0>", "b",                   desc = "Move word backward",   mode = "n" },
+  { "<Char-0xB0>", "<C-o>b",              desc = "Move word backward",   mode = "i" },
+  { "<Char-0xB0>", "<Esc>b",              desc = "Move word backward",   mode = "t" },
+  { "<Char-0xB1>", "w",                   desc = "Move word forward",    mode = "n" },
+  { "<Char-0xB1>", "<C-o>w",              desc = "Move word forward",    mode = "i" },
+  { "<Char-0xB1>", "<Esc>f",              desc = "Move word forward",    mode = "t" },
+
+  -- Quickfix list
+  {
+    "<leader>Q",
+    function()
+      local qf_exists = false
+      for _, win in pairs(vim.fn.getwininfo()) do
+        if win.quickfix == 1 then
+          qf_exists = true
+          break
+        end
+      end
+      if qf_exists == true then
+        vim.cmd('cclose')
+      else
+        vim.cmd('copen')
+      end
+    end,
+    desc = "Toggle quickfix list",
+    mode = "n",
+  },
 })
+
+-- Copilot configuration
 vim.g.copilot_no_tab_map = true
 
-vim.keymap.set({ "n", "v" }, "<leader>aa", function()
-  require("avante.api").ask()
-end, opts)
-vim.keymap.set({ "v" }, "<leader>ar", function()
-  require("avante.api").refresh()
-end, opts)
-vim.keymap.set({ "n", "v" }, "<leader>ae", function()
-  require("avante.api").edit()
-end, opts)
-
--- The keymaps below are special characters sent to neovim from wezterm
--- refer to .wezterm.lua for the keybindings
-vim.keymap.set('n', '<Char-0xAA>', '<cmd>write<cr>', opts)
-vim.keymap.set('v', '<Char-0xAB>', 'y<cmd>let @+=@0<CR>', opts)
-vim.keymap.set({ 'n', 'i' }, '<Char-0xAD>', ':norm "+p', opts)
-
--- Option+Arrow key mappings in normal mode/insert/terminal mode
-vim.keymap.set('n', '<Char-0xB0>', 'b', opts)
-vim.keymap.set('i', '<Char-0xB0>', '<C-o>b', opts)
-vim.keymap.set('t', '<Char-0xB0>', '<Esc>b', opts)
-vim.keymap.set('n', '<Char-0xB1>', 'w', opts)
-vim.keymap.set('i', '<Char-0xB1>', '<C-o>w', opts)
-vim.keymap.set('t', '<Char-0xB1>', '<Esc>f', opts)
-
--- common commands mispelled
+-- Common commands misspelled
 vim.api.nvim_create_user_command('Wa', function(opts)
   vim.cmd('wa' .. (opts.args ~= '' and ' ' .. opts.args or ''))
 end, { nargs = '*' })
+
 vim.api.nvim_create_user_command('Qa', function(opts)
   vim.cmd('qa' .. (opts.args ~= '' and ' ' .. opts.args or ''))
 end, { nargs = '*' })
-
--- Toggle quickfix list and move cursor to it if opened
-vim.keymap.set('n', '<leader>Q', function()
-  local qf_exists = false
-  for _, win in pairs(vim.fn.getwininfo()) do
-    if win.quickfix == 1 then
-      qf_exists = true
-      break
-    end
-  end
-  if qf_exists == true then
-    vim.cmd('cclose')
-  else
-    vim.cmd('copen')
-  end
-end, opts)

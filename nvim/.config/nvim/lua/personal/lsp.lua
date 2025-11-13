@@ -26,10 +26,18 @@ vim.diagnostic.config({
     header = "",
   },
 })
-local opts = { noremap = true, silent = true, nowait = true }
-vim.keymap.set("n", "<leader>le", function()
-  vim.diagnostic.setqflist({ severity = { min = "ERROR" } })
-end, opts)
+local wk = require("which-key")
+wk.add({
+  { "<leader>l", group = "LSP" },
+  {
+    "<leader>le",
+    function()
+      vim.diagnostic.setqflist({ severity = { min = "ERROR" } })
+    end,
+    desc = "List errors in quickfix",
+    mode = "n",
+  },
+})
 
 -- Add cmp_nvim_lsp capabilities settings to lspconfig
 -- This should be executed before you configure any language server
@@ -46,34 +54,45 @@ vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
   callback = function(event)
     -- Keymaps
-    local opts = { noremap = true, silent = true, buffer = event.buf }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', 'gk', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', 'gl', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', 'gL', function()
-      -- toggle virtual lines
-      local has_virtual_lines = vim.diagnostic.config().virtual_lines ~= false
-      if (has_virtual_lines) then
-        vim.diagnostic.config(virtual_configs)
-      else
-        vim.diagnostic.config(virtual_configs_lines)
-      end
-    end, opts)
-    -- vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-    -- vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    -- vim.keymap.set('n', '<leader>wl', function()
-    --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    -- end, opts)
-    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', '<leader>f', function()
-      vim.lsp.buf.format { async = true }
-    end, opts)
+    local wk = require("which-key")
+    wk.add({
+      { "g", group = "Go to", buffer = event.buf },
+      { "gD", vim.lsp.buf.declaration, desc = "Go to declaration", buffer = event.buf, mode = "n" },
+      { "gd", vim.lsp.buf.definition, desc = "Go to definition", buffer = event.buf, mode = "n" },
+      { "K", vim.lsp.buf.hover, desc = "Hover documentation", buffer = event.buf, mode = "n" },
+      { "gi", vim.lsp.buf.implementation, desc = "Go to implementation", buffer = event.buf, mode = "n" },
+      { "gr", vim.lsp.buf.references, desc = "Go to references", buffer = event.buf, mode = "n" },
+      { "gk", vim.lsp.buf.signature_help, desc = "Signature help", buffer = event.buf, mode = "n" },
+      { "gl", vim.diagnostic.open_float, desc = "Show line diagnostics", buffer = event.buf, mode = "n" },
+      {
+        "gL",
+        function()
+          -- toggle virtual lines
+          local has_virtual_lines = vim.diagnostic.config().virtual_lines ~= false
+          if (has_virtual_lines) then
+            vim.diagnostic.config(virtual_configs)
+          else
+            vim.diagnostic.config(virtual_configs_lines)
+          end
+        end,
+        desc = "Toggle virtual lines",
+        buffer = event.buf,
+        mode = "n",
+      },
+      { "<leader>D", vim.lsp.buf.type_definition, desc = "Type definition", buffer = event.buf, mode = "n" },
+      { "<F2>", vim.lsp.buf.rename, desc = "Rename symbol", buffer = event.buf, mode = "n" },
+      { "<leader>c", group = "Code", buffer = event.buf },
+      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code action", buffer = event.buf, mode = "n" },
+      {
+        "<leader>f",
+        function()
+          vim.lsp.buf.format { async = true }
+        end,
+        desc = "Format buffer",
+        buffer = event.buf,
+        mode = "n",
+      },
+    })
   end
 })
 
@@ -247,6 +266,8 @@ if ts_repeat_move_status then
   )
 
   -- Map the diagnostic navigation to use repeatable_move
-  vim.keymap.set('n', ']d', next_diagnostic, { noremap = true, silent = true })
-  vim.keymap.set('n', '[d', prev_diagnostic, { noremap = true, silent = true })
+  wk.add({
+    { "]d", next_diagnostic, desc = "Next diagnostic", mode = "n" },
+    { "[d", prev_diagnostic, desc = "Previous diagnostic", mode = "n" },
+  })
 end
