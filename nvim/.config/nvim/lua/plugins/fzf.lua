@@ -148,35 +148,59 @@ return {
     -- if the current buffer is an oil buffer, it will create a grep command to search within the current directory
     -- and add the command to the command history
     vim.api.nvim_create_user_command("Rg", function(opts)
-      local search = table.concat(opts.fargs, " ")
+      local search_text
+      if opts.range > 0 then
+        -- Visual mode: get selected text
+        search_text = require("fzf-lua.utils").get_visual_selection()
+      else
+        -- Normal mode: use command arguments
+        search_text = table.concat(opts.fargs, " ")
+      end
+
       if vim.bo.filetype == "oil" then
         local oil = require("oil");
         local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
         if vim.bo.filetype == "oil" and is_floating_window() then
           oil.close()
         end
-        local cmd_string = string.format('FzfLua grep search=%s cwd=%s', search, dir)
+        local cmd_string = string.format('FzfLua grep search=%s cwd=%s', search_text, dir)
         vim.cmd(cmd_string)
         vim.fn.histadd('cmd', cmd_string)
       else
         require("fzf-lua").grep({
-          search = search,
+          search = search_text,
         })
       end
-    end, { nargs = "*" })
+    end, { nargs = "*", range = true })
 
     -- Create :Rf command for searching in quickfix files
     vim.api.nvim_create_user_command("Rf", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
+      local search_text
+      if opts.range > 0 then
+        -- Visual mode: get selected text
+        search_text = require("fzf-lua.utils").get_visual_selection()
+      else
+        -- Normal mode: use command arguments
+        search_text = table.concat(opts.fargs, " ")
+      end
+
       require("fzf-lua").grep_quickfix({
         search = search_text,
         input_prompt = 'Grep in quickfix files ❯ ',
       })
-    end, { nargs = "*" })
+    end, { nargs = "*", range = true })
 
     -- Create :Rb command for searching in buffer files
     vim.api.nvim_create_user_command("Rb", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
+      local search_text
+      if opts.range > 0 then
+        -- Visual mode: get selected text
+        search_text = require("fzf-lua.utils").get_visual_selection()
+      else
+        -- Normal mode: use command arguments
+        search_text = table.concat(opts.fargs, " ")
+      end
+
       -- Get files from open buffers
       local buffer_files = get_buffer_files()
 
@@ -190,6 +214,6 @@ return {
         input_prompt = 'Grep in buffer files ❯ ',
         search_paths = buffer_files,
       })
-    end, { nargs = "*" })
+    end, { nargs = "*", range = true })
   end
 }
