@@ -4,13 +4,13 @@ if not status_ok then
 end
 
 configs.setup({
-  ensure_installed = { "bash", "c", "javascript", "json", "lua", "python", "typescript", "tsx", "css", "rust", "java", "yaml", "markdown", "markdown_inline", "kotlin"}, -- one of "all" or a list of languages
+  ensure_installed = { "bash", "c", "javascript", "json", "lua", "python", "typescript", "tsx", "css", "rust", "java", "yaml", "markdown", "markdown_inline", "kotlin" }, -- one of "all" or a list of languages
   sync_install = false,
   auto_install = true,
   ignore_install = { "phpdoc" }, -- List of parsers to ignore installing
   highlight = {
-    enable = true, -- false will disable the whole extension
-    disable = { "vim" }, -- list of language that will be disabled
+    enable = true,               -- false will disable the whole extension
+    disable = { "vim" },         -- list of language that will be disabled
   },
   autopairs = {
     enable = true,
@@ -69,7 +69,7 @@ configs.setup({
       -- mapping query_strings to modes.
       selection_modes = {
         ['@parameter.outer'] = 'v', -- charwise
-        ['@function.outer'] = 'V', -- linewise
+        ['@function.outer'] = 'V',  -- linewise
         ['@class.outer'] = '<c-v>', -- blockwise
       },
       -- If you set this to `true` (default is `false`) then any textobject is
@@ -165,38 +165,38 @@ if ts_repeat_move_status then
 
   -- Add quicklist navigation with repeatable move
   local cnext, cprev = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("cnext") end,
-    function() vim.cmd("cprevious") end
+    function() vim.cmd("Cnext") end,
+    function() vim.cmd("Cprev") end
   )
 
   -- Quicklist stack navigation
   local colder, cnewer = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("cnewer") end,
-    function() vim.cmd("colder") end
+    function() vim.cmd("colder") end,
+    function() vim.cmd("cnewer") end
   )
 
   wk.add({
     -- Repeat movement with ; and ,
-    { ";", ts_repeat_move.repeat_last_move, desc = "Repeat last move", mode = { "n", "x", "o" } },
-    { ",", ts_repeat_move.repeat_last_move_opposite, desc = "Repeat last move (opposite)", mode = { "n", "x", "o" } },
+    { ";",  ts_repeat_move.repeat_last_move,          desc = "Repeat last move",            mode = { "n", "x", "o" } },
+    { ",",  ts_repeat_move.repeat_last_move_opposite, desc = "Repeat last move (opposite)", mode = { "n", "x", "o" } },
 
     -- Make builtin f, F, t, T also repeatable with ; and ,
-    { "f", ts_repeat_move.builtin_f_expr, desc = "Find char forward", mode = { "n", "x", "o" }, expr = true },
-    { "F", ts_repeat_move.builtin_F_expr, desc = "Find char backward", mode = { "n", "x", "o" }, expr = true },
-    { "t", ts_repeat_move.builtin_t_expr, desc = "Till char forward", mode = { "n", "x", "o" }, expr = true },
-    { "T", ts_repeat_move.builtin_T_expr, desc = "Till char backward", mode = { "n", "x", "o" }, expr = true },
+    { "f",  ts_repeat_move.builtin_f_expr,            desc = "Find char forward",           mode = { "n", "x", "o" }, expr = true },
+    { "F",  ts_repeat_move.builtin_F_expr,            desc = "Find char backward",          mode = { "n", "x", "o" }, expr = true },
+    { "t",  ts_repeat_move.builtin_t_expr,            desc = "Till char forward",           mode = { "n", "x", "o" }, expr = true },
+    { "T",  ts_repeat_move.builtin_T_expr,            desc = "Till char backward",          mode = { "n", "x", "o" }, expr = true },
 
     -- Buffer navigation
-    { "]", group = "Next" },
-    { "[", group = "Previous" },
-    { "]t", bnext, desc = "Next buffer", mode = { "n", "x", "o" } },
-    { "[t", bprev, desc = "Previous buffer", mode = { "n", "x", "o" } },
+    { "]",  group = "Next" },
+    { "[",  group = "Previous" },
+    { "]t", bnext,                                    desc = "Next buffer",                 mode = { "n", "x", "o" } },
+    { "[t", bprev,                                    desc = "Previous buffer",             mode = { "n", "x", "o" } },
 
     -- Quickfix navigation
-    { "]q", cnext, desc = "Next quickfix item", mode = { "n", "x", "o" } },
-    { "[q", cprev, desc = "Previous quickfix item", mode = { "n", "x", "o" } },
-    { "]Q", colder, desc = "Newer quickfix list", mode = { "n", "x", "o" } },
-    { "[Q", cnewer, desc = "Older quickfix list", mode = { "n", "x", "o" } },
+    { "]q", cnext,                                    desc = "Next quickfix item",          mode = { "n", "x", "o" } },
+    { "[q", cprev,                                    desc = "Previous quickfix item",      mode = { "n", "x", "o" } },
+    { "]Q", colder,                                   desc = "Newer quickfix list",         mode = { "n", "x", "o" } },
+    { "[Q", cnewer,                                   desc = "Older quickfix list",         mode = { "n", "x", "o" } },
   })
 else
   vim.api.nvim_err_writeln("[Error] " .. "cannot find nvim-treesitter.textobjects.repeatable_move")
@@ -204,21 +204,20 @@ end
 
 local context_ok, context = pcall(require, "treesitter-context")
 if context_ok then
-  context.setup{
-    enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
-    max_lines = 3, -- How many lines the window should span. Values <= 0 mean no limit.
-    min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+  context.setup {
+    enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
+    max_lines = 3,            -- How many lines the window should span. Values <= 0 mean no limit.
+    min_window_height = 0,    -- Minimum editor window height to enable context. Values <= 0 mean no limit.
     line_numbers = true,
     multiline_threshold = 10, -- Maximum number of lines to show for a single context
-    trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-    mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
+    trim_scope = 'outer',     -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+    mode = 'cursor',          -- Line used to calculate context. Choices: 'cursor', 'topline'
     -- Separator between context and content. Should be a single character string, like '-'.
     -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
     separator = '-',
-    zindex = 20, -- The Z-index of the context window
+    zindex = 20,     -- The Z-index of the context window
     on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
   }
 else
   vim.api.nvim_err_writeln("[Error] " .. "failed to setup treesitter-context")
 end
-

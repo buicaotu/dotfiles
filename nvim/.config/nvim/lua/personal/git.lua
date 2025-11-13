@@ -84,6 +84,21 @@ local function close_all_fugitive_diff_windows()
   end
 end
 
+local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+-- Diff Quicklist stack navigation
+local diff_next, diff_prev = ts_repeat_move.make_repeatable_move_pair(
+  function()
+    close_all_fugitive_diff_windows()
+    vim.cmd("Cnext")
+    vim.cmd('Gvdiffsplit! ' .. current_commit .. ':%')
+  end,
+  function()
+    close_all_fugitive_diff_windows()
+    vim.cmd("Cprev")
+    vim.cmd('Gvdiffsplit! ' .. current_commit .. ':%')
+  end
+)
+
 local wk = require("which-key")
 wk.add({
   { "<leader>d",  group = "Diff/Debug" },
@@ -144,4 +159,16 @@ wk.add({
   { "<leader>dc", close_all_fugitive_diff_windows, desc = "Close fugitive diff windows", mode = "n" },
   { "<leader>m",  group = "Merge" },
   { "<leader>mt", ':G mergetool <CR>',             desc = "Git mergetool",               mode = "n" },
+  {
+    "]r",
+    diff_next,
+    desc = "Next diff view",
+    mode = { "n", "x", "o" }
+  },
+  {
+    "[r",
+    diff_prev,
+    desc = "Previous diff view",
+    mode = { "n", "x", "o" }
+  },
 })

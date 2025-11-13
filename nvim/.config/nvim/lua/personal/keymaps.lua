@@ -162,3 +162,23 @@ end, { nargs = '*' })
 vim.api.nvim_create_user_command('Qa', function(opts)
   vim.cmd('qa' .. (opts.args ~= '' and ' ' .. opts.args or ''))
 end, { nargs = '*' })
+
+vim.api.nvim_create_user_command('Cnext', function(opts)
+  local ok, err = pcall(vim.cmd, 'cnext')
+  if not ok then
+    if err:match('E553') then -- E553: No more items
+      vim.notify('Already last - go to first', vim.log.levels.WARN)
+      vim.cmd('cfirst')
+    end
+  end
+end, { nargs = '*' })
+
+vim.api.nvim_create_user_command('Cprev', function(opts)
+  local ok, err = pcall(vim.cmd, 'cprevious')
+  if not ok then
+    if err:match('E553') then -- E553: No more items
+      vim.notify('Already first - go to last', vim.log.levels.WARN)
+      vim.cmd('clast')
+    end
+  end
+end, { nargs = '*' })
