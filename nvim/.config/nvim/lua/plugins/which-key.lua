@@ -15,13 +15,4 @@ return {
     local wk = require("which-key")
     wk.setup(opts)
   end,
-  keys = {
-    {
-      "<leader>?",
-      function()
-        require("which-key").show({ global = true })
-      end,
-      desc = "Buffer Local Keymaps (which-key)",
-    },
-  },
 }
