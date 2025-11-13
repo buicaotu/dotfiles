@@ -120,6 +120,10 @@ wk.add({
 vim.g.copilot_no_tab_map = true
 
 -- Common commands misspelled
+vim.api.nvim_create_user_command('W', function(opts)
+  vim.cmd('w' .. (opts.args ~= '' and ' ' .. opts.args or ''))
+end, { nargs = '*' })
+
 vim.api.nvim_create_user_command('Wa', function(opts)
   vim.cmd('wa' .. (opts.args ~= '' and ' ' .. opts.args or ''))
 end, { nargs = '*' })
