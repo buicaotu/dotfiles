@@ -3,7 +3,6 @@ local core = require("personal.command_palette.core")
 
 -- Register commands
 function M.setup()
-  core.register_command("workflow: diff green", ":DiffGreen")
   core.register_command("workflow: diff commit", function()
     local commit = vim.fn.input("Commit/Branch: ")
     commit = commit ~= "" and commit or "@"

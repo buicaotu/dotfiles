@@ -2,13 +2,26 @@ local wk = require("which-key")
 
 wk.add({
   -- Visual mode mappings
-  { "p",         '"_dP',  desc = "Paste without yank",     mode = "v" },
-
+  {
+    "p",
+    '"_dP',
+    desc = "Paste without yank",
+    mode = "v"
+  },
   -- Clipboard
-  { "<leader>y", '"+y',   desc = "Yank to clipboard",      mode = { "n", "v" } },
-
+  {
+    "<leader>y",
+    '"+y',
+    desc = "Yank to clipboard",
+    mode = { "n", "v" }
+  },
   -- Window navigation
-  { "<Tab>",     "<C-^>", desc = "Toggle between buffers", mode = "n" },
+  {
+    "<Tab>",
+    "<C-^>",
+    desc = "Toggle between buffers",
+    mode = "n"
+  },
 
   -- Terminal mappings
   {
@@ -22,12 +35,23 @@ wk.add({
     mode = "t",
     expr = true,
   },
-  { "<C-]>", "<C-\\><C-N>", desc = "Exit terminal mode",      mode = "t" },
-  { "<M-r>", "<C-r>",       desc = "Send Ctrl-R to terminal", mode = "t" },
+  {
+    "<C-]>",
+    "<C-\\><C-N>",
+    desc = "Exit terminal mode",
+    mode = "t"
+  },
+  {
+    "<M-r>",
+    "<C-r>",
+    desc = "Send Ctrl-R to terminal",
+    mode = "t"
+  },
 
   -- Window management
+  { "<leader>b", group = "Window and buffer" },
   {
-    "<leader>q",
+    "<leader>bq",
     function()
       if #vim.api.nvim_list_wins() > 1 then
         vim.cmd("q")
@@ -36,10 +60,6 @@ wk.add({
     desc = "Close window",
     mode = "n",
   },
-
-  -- Buffer management
-  { "<leader>x", ":bn|bd#<CR>",  desc = "Delete buffer (keep window)", mode = "n" },
-  { "<leader>X", ":bn|bd#!<CR>", desc = "Delete buffer! (force)",      mode = "n" },
 
   -- LSP Inlay hints
   {
@@ -52,7 +72,14 @@ wk.add({
   },
 
   -- Copilot
-  { "<C-J>",     'copilot#Accept("\\<CR>")', desc = "Accept Copilot suggestion", mode = "i", expr = true, replace_keycodes = false },
+  {
+    "<C-J>",
+    'copilot#Accept("\\<CR>")',
+    desc = "Accept Copilot suggestion",
+    mode = "i",
+    expr = true,
+    replace_keycodes = false
+  },
 
   -- Avante
   { "<leader>a", group = "Avante" },
@@ -96,7 +123,11 @@ wk.add({
 
   -- Quickfix list
   {
-    "<leader>Q",
+    "<leader>q",
+    group = "Quickfix list",
+  },
+  {
+    "<leader>qq",
     function()
       local qf_exists = false
       for _, win in pairs(vim.fn.getwininfo()) do
