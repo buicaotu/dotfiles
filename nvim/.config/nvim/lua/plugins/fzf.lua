@@ -26,6 +26,34 @@ local function is_floating_window()
   return win_config.relative ~= ''
 end
 
+local function grep(opts, grep_opts)
+  local search_text
+  if opts.range > 0 then
+    -- Visual mode: get selected text
+    search_text = require("fzf-lua.utils").get_visual_selection()
+  else
+    -- Normal mode: use command arguments
+    search_text = table.concat(opts.fargs, " ")
+  end
+
+  if vim.bo.filetype == "oil" then
+    local oil = require("oil");
+    local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
+    if vim.bo.filetype == "oil" and is_floating_window() then
+      oil.close()
+    end
+    local grep_opts_string = grep_opts.no_esc and "no_esc=true" or ""
+    local cmd_string = string.format('FzfLua grep search=%s cwd=%s %s', search_text, dir, grep_opts_string)
+    vim.cmd(cmd_string)
+    vim.fn.histadd('cmd', cmd_string)
+  else
+    require("fzf-lua").grep({
+      search = search_text,
+      no_esc = grep_opts.no_esc,
+    })
+  end
+end
+
 return {
   "ibhagwan/fzf-lua",
   dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -74,15 +102,6 @@ return {
         mode = "n",
       },
       {
-        "<leader>r",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rg(selected_text)
-        end,
-        desc = "Grep visual selection",
-        mode = "v",
-      },
-      {
         "<leader>rf",
         function()
           vim.cmd.Rf(vim.fn.expand("<cword>"))
@@ -91,30 +110,12 @@ return {
         mode = "n",
       },
       {
-        "<leader>rf",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rf(selected_text)
-        end,
-        desc = "Grep selection in quickfix",
-        mode = "v",
-      },
-      {
         "<leader>rb",
         function()
           vim.cmd.Rb(vim.fn.expand("<cword>"))
         end,
         desc = "Grep in buffer files",
         mode = "n",
-      },
-      {
-        "<leader>rb",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rb(selected_text)
-        end,
-        desc = "Grep selection in buffers",
-        mode = "v",
       },
       {
         "<leader>s",
@@ -132,7 +133,12 @@ return {
         desc = "Find buffers",
         mode = "n",
       },
-      { "<leader>p", vim.cmd.FzfLua,       desc = "FzfLua", mode = "n" },
+      {
+        "<leader>p",
+        vim.cmd.FzfLua,
+        desc = "FzfLua",
+        mode = "n"
+      },
       {
         "<leader>lf",
         function()
@@ -148,29 +154,10 @@ return {
     -- if the current buffer is an oil buffer, it will create a grep command to search within the current directory
     -- and add the command to the command history
     vim.api.nvim_create_user_command("Rg", function(opts)
-      local search_text
-      if opts.range > 0 then
-        -- Visual mode: get selected text
-        search_text = require("fzf-lua.utils").get_visual_selection()
-      else
-        -- Normal mode: use command arguments
-        search_text = table.concat(opts.fargs, " ")
-      end
-
-      if vim.bo.filetype == "oil" then
-        local oil = require("oil");
-        local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
-        if vim.bo.filetype == "oil" and is_floating_window() then
-          oil.close()
-        end
-        local cmd_string = string.format('FzfLua grep search=%s cwd=%s', search_text, dir)
-        vim.cmd(cmd_string)
-        vim.fn.histadd('cmd', cmd_string)
-      else
-        require("fzf-lua").grep({
-          search = search_text,
-        })
-      end
+      grep(opts, { no_esc = false })
+    end, { nargs = "*", range = true })
+    vim.api.nvim_create_user_command("RG", function(opts)
+      grep(opts, { no_esc = true })
     end, { nargs = "*", range = true })
 
     -- Create :Rf command for searching in quickfix files
