@@ -22,7 +22,8 @@ wk.add({
     mode = "t",
     expr = true,
   },
-  { "<C-]>",     "<C-\\><C-N>",  desc = "Exit terminal mode",          mode = "t" },
+  { "<C-]>", "<C-\\><C-N>", desc = "Exit terminal mode",      mode = "t" },
+  { "<M-r>", "<C-r>",       desc = "Send Ctrl-R to terminal", mode = "t" },
 
   -- Window management
   {
