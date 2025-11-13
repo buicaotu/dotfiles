@@ -10,8 +10,6 @@ return {
     keymaps = {
       ['<leader>y'] = 'actions.copy_entry_path',
       ['<leader>c'] = 'actions.cd',
-      ['<leader>r'] = ':OilGrep<CR>',
-      ['<leader>s'] = ':OilFiles<CR>',
       ['<leader>v'] = 'actions.select_vsplit',
       ['<leader>i'] = 'actions.preview',
       ['<Tab>'] = 'actions.select',

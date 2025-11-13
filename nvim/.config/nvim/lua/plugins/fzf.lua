@@ -132,7 +132,7 @@ return {
       {
         "<leader>s",
         function()
-          vim.cmd.FzfLua('files')
+          vim.cmd.Files()
         end,
         desc = "Find files",
         mode = "n",
@@ -213,6 +213,22 @@ return {
         input_prompt = 'Grep in buffer files ❯ ',
         search_paths = buffer_files,
       })
+    end, { nargs = "*", range = true })
+
+    -- Files
+    vim.api.nvim_create_user_command("Files", function(opts)
+      if vim.bo.filetype == "oil" then
+        local oil = require("oil");
+        local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
+        if vim.bo.filetype == "oil" then
+          oil.close()
+        end
+        local cmd_string = string.format('FzfLua files cwd=%s', dir)
+        vim.cmd(cmd_string)
+        vim.fn.histadd('cmd', cmd_string)
+      else
+        vim.cmd.FzfLua('files')
+      end
     end, { nargs = "*", range = true })
   end
 }
