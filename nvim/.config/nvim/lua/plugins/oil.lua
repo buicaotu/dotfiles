@@ -10,8 +10,6 @@ return {
     keymaps = {
       ['<leader>y'] = 'actions.copy_entry_path',
       ['<leader>c'] = 'actions.cd',
-      ['<leader>r'] = ':OilGrep<CR>',
-      ['<leader>s'] = ':OilFiles<CR>',
       ['<leader>v'] = 'actions.select_vsplit',
       ['<leader>i'] = 'actions.preview',
       ['<Tab>'] = 'actions.select',
@@ -21,16 +19,6 @@ return {
     }
   },
   init = function()
-    -- Define custom commands
-    vim.api.nvim_create_user_command("OilGrep", function(opts)
-      local oil = require("oil");
-      local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
-      if vim.bo.filetype == "oil" and is_floating_window() then
-        oil.close()
-      end
-      require("personal.command_palette").grep(dir, opts.fargs[1])
-    end, { nargs = "?" })
-
     -- open fzf files of the current directory
     vim.api.nvim_create_user_command("OilFiles", function()
       local oil = require("oil");
@@ -52,7 +40,7 @@ return {
         desc = "Toggle Oil file explorer",
         mode = "n",
       },
-      { "<leader>o", group = "Oil" },
+      { "<leader>o",  group = "Oil" },
       { "<leader>of", ":OilFiles<CR>", desc = "Oil files", mode = "n" },
     })
 

@@ -20,6 +20,52 @@ local function get_buffer_files()
   return file_list
 end
 
+-- a function to check if the current buffer is in a float window
+local function is_floating_window()
+  local win_config = vim.api.nvim_win_get_config(0)
+  return win_config.relative ~= ''
+end
+
+-- Grep function that handles searching with fzf-lua
+-- @param opts Command options (from vim.api.nvim_create_user_command)
+--   - opts.range: >0 if called from visual mode
+--   - opts.fargs: command arguments array
+-- @param grep_opts Grep-specific options
+--   - grep_opts.no_esc: if true, disables escaping of special characters in search pattern
+-- Behavior:
+--   - In oil buffers: searches within the current directory, closes floating oil window if open,
+--     and adds the command to command history
+--   - In regular buffers: uses fzf-lua's grep function directly
+--   - Visual mode: searches for selected text
+--   - Normal mode: searches for command arguments
+local function grep(opts, grep_opts)
+  local search_text
+  if opts.range > 0 then
+    -- Visual mode: get selected text
+    search_text = require("fzf-lua.utils").get_visual_selection()
+  else
+    -- Normal mode: use command arguments
+    search_text = table.concat(opts.fargs, " ")
+  end
+
+  if vim.bo.filetype == "oil" then
+    local oil = require("oil");
+    local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
+    if vim.bo.filetype == "oil" and is_floating_window() then
+      oil.close()
+    end
+    local grep_opts_string = grep_opts.no_esc and "no_esc=true" or ""
+    local cmd_string = string.format('FzfLua grep search=%s cwd=%s %s', search_text, dir, grep_opts_string)
+    vim.cmd(cmd_string)
+    vim.fn.histadd('cmd', cmd_string)
+  else
+    require("fzf-lua").grep({
+      search = search_text,
+      no_esc = grep_opts.no_esc,
+    })
+  end
+end
+
 return {
   "ibhagwan/fzf-lua",
   dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -68,38 +114,12 @@ return {
         mode = "n",
       },
       {
-        "<leader>r",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rg(selected_text)
-        end,
-        desc = "Grep visual selection",
-        mode = "v",
-      },
-      {
-        "<leader>R",
-        function()
-          vim.cmd.OilGrep(vim.fn.expand("<cword>"))
-        end,
-        desc = "Grep in current directory",
-        mode = "n",
-      },
-      {
         "<leader>rf",
         function()
           vim.cmd.Rf(vim.fn.expand("<cword>"))
         end,
         desc = "Grep in quickfix files",
         mode = "n",
-      },
-      {
-        "<leader>rf",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rf(selected_text)
-        end,
-        desc = "Grep selection in quickfix",
-        mode = "v",
       },
       {
         "<leader>rb",
@@ -110,18 +130,9 @@ return {
         mode = "n",
       },
       {
-        "<leader>rb",
-        function()
-          local selected_text = require("fzf-lua.utils").get_visual_selection()
-          vim.cmd.Rb(selected_text)
-        end,
-        desc = "Grep selection in buffers",
-        mode = "v",
-      },
-      {
         "<leader>s",
         function()
-          vim.cmd.FzfLua('files')
+          vim.cmd.Files()
         end,
         desc = "Find files",
         mode = "n",
@@ -134,7 +145,12 @@ return {
         desc = "Find buffers",
         mode = "n",
       },
-      { "<leader>p", vim.cmd.FzfLua, desc = "FzfLua", mode = "n" },
+      {
+        "<leader>p",
+        vim.cmd.FzfLua,
+        desc = "FzfLua",
+        mode = "n"
+      },
       {
         "<leader>lf",
         function()
@@ -145,33 +161,45 @@ return {
       },
     })
 
-    -- todo: grep selected word/word under cursor within current folder
-
-    -- Setup FZF Vim commands
-    -- require("fzf-lua").setup_fzfvim_cmds()
-
     -- Create :Rg command for searching
+    -- The command will search using fzf-lua's grep function
+    -- if the current buffer is an oil buffer, it will create a grep command to search within the current directory
+    -- and add the command to the command history
     vim.api.nvim_create_user_command("Rg", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
-      if vim.bo.filetype == "oil" then
-        vim.cmd.OilGrep(search_text)
-      else
-        require("personal.command_palette").grep(vim.fn.getcwd(), search_text)
-      end
-    end, { nargs = "*" })
+      grep(opts, { no_esc = false })
+    end, { nargs = "*", range = true })
+    vim.api.nvim_create_user_command("RG", function(opts)
+      grep(opts, { no_esc = true })
+    end, { nargs = "*", range = true })
 
     -- Create :Rf command for searching in quickfix files
     vim.api.nvim_create_user_command("Rf", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
+      local search_text
+      if opts.range > 0 then
+        -- Visual mode: get selected text
+        search_text = require("fzf-lua.utils").get_visual_selection()
+      else
+        -- Normal mode: use command arguments
+        search_text = table.concat(opts.fargs, " ")
+      end
+
       require("fzf-lua").grep_quickfix({
         search = search_text,
         input_prompt = 'Grep in quickfix files ❯ ',
       })
-    end, { nargs = "*" })
+    end, { nargs = "*", range = true })
 
     -- Create :Rb command for searching in buffer files
     vim.api.nvim_create_user_command("Rb", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
+      local search_text
+      if opts.range > 0 then
+        -- Visual mode: get selected text
+        search_text = require("fzf-lua.utils").get_visual_selection()
+      else
+        -- Normal mode: use command arguments
+        search_text = table.concat(opts.fargs, " ")
+      end
+
       -- Get files from open buffers
       local buffer_files = get_buffer_files()
 
@@ -185,6 +213,22 @@ return {
         input_prompt = 'Grep in buffer files ❯ ',
         search_paths = buffer_files,
       })
-    end, { nargs = "*" })
+    end, { nargs = "*", range = true })
+
+    -- Files
+    vim.api.nvim_create_user_command("Files", function(opts)
+      if vim.bo.filetype == "oil" then
+        local oil = require("oil");
+        local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
+        if vim.bo.filetype == "oil" then
+          oil.close()
+        end
+        local cmd_string = string.format('FzfLua files cwd=%s', dir)
+        vim.cmd(cmd_string)
+        vim.fn.histadd('cmd', cmd_string)
+      else
+        vim.cmd.FzfLua('files')
+      end
+    end, { nargs = "*", range = true })
   end
 }
