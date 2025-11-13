@@ -23,12 +23,12 @@ if ok then
   end
 end
 
-
-require "personal.keymaps"
-require "personal.options"
+-- leader key
+vim.g.mapleader = ' '
 
 require("lazy").setup("plugins")
-
+require "personal.keymaps"
+require "personal.options"
 require "personal.treesitter"
 require "personal.comment"
 require "personal.lsp"

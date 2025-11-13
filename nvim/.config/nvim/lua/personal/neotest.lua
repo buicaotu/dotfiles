@@ -42,6 +42,10 @@ end
 --
 -- ~/.local/share/nvim/site/pack/packer/start
 
-vim.api.nvim_set_keymap('n', '<leader>to', ':lua open_test_window()<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>tt', ':lua run_nearest_test()<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>ta', ':lua run_current_file()<CR>', { noremap = true, silent = true })
+local wk = require("which-key")
+wk.add({
+  { "<leader>t", group = "Test" },
+  { "<leader>to", ':lua open_test_window()<CR>', desc = "Open test output", mode = "n" },
+  { "<leader>tt", ':lua run_nearest_test()<CR>', desc = "Run nearest test", mode = "n" },
+  { "<leader>ta", ':lua run_current_file()<CR>', desc = "Run all tests in file", mode = "n" },
+})

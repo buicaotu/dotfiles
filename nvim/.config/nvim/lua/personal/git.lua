@@ -99,40 +99,6 @@ vim.api.nvim_create_user_command('DiffMaster', diff_branch_factory('master'), {}
 
 
 -- git-fugitive keymaps
-
--- difftool against current working directory
-vim.keymap.set("n", "<leader>dt", ':G! difftool --name-only<CR>', opts)
--- difftool against a specific commit and store the commit
-vim.keymap.set("n", "<leader>Dt", function()
-  local commit = vim.fn.input("Commit: ")
-  current_commit = commit
-  if commit ~= "" then
-    vim.cmd('G! difftool --name-only ' .. commit)
-  end
-end, opts)
-vim.keymap.set("n", "<leader>dG", ':DiffGreen<CR>', opts)
-
--- diff against current working directory
-vim.keymap.set("n", "<leader>ds", function()
-  vim.cmd("Gvdiffsplit!")
-end, opts)
-vim.keymap.set("n", "<leader>dS", function()
-  vim.cmd("Gvdiffsplit! @")
-end, opts)
--- diff against a specific commit
-vim.keymap.set("n", "<leader>DS", function()
-  local commit = vim.fn.input("Commit: ")
-  if commit ~= "" then
-    vim.cmd('Gvdiffsplit! ' .. commit)
-  end
-end, opts)
--- diff against the stored commit from (Dt)
-vim.keymap.set('n', '<leader>dg', function()
-  vim.cmd('Gvdiffsplit! ' .. current_commit .. ':%')
-end, opts)
-
-vim.keymap.set("n", "<leader>mt", ':G mergetool <CR>', opts)
-
 local function close_all_fugitive_diff_windows()
   -- find and close fugitive diff windows
   local wins = vim.api.nvim_tabpage_list_wins(0)
@@ -150,4 +116,60 @@ local function close_all_fugitive_diff_windows()
     end
   end
 end
-vim.keymap.set('n', '<leader>dc', close_all_fugitive_diff_windows, { desc = 'Close fugitive diff windows' })
+
+local wk = require("which-key")
+wk.add({
+  { "<leader>d", group = "Diff/Debug" },
+  { "<leader>dt", ':G! difftool --name-only<CR>', desc = "Difftool (working dir)", mode = "n" },
+  {
+    "<leader>Dt",
+    function()
+      local commit = vim.fn.input("Commit: ")
+      current_commit = commit
+      if commit ~= "" then
+        vim.cmd('G! difftool --name-only ' .. commit)
+      end
+    end,
+    desc = "Difftool (specific commit)",
+    mode = "n",
+  },
+  { "<leader>dG", ':DiffGreen<CR>', desc = "Diff green branch", mode = "n" },
+  {
+    "<leader>ds",
+    function()
+      vim.cmd("Gvdiffsplit!")
+    end,
+    desc = "Diff split (working dir)",
+    mode = "n",
+  },
+  {
+    "<leader>dS",
+    function()
+      vim.cmd("Gvdiffsplit! @")
+    end,
+    desc = "Diff split (@)",
+    mode = "n",
+  },
+  {
+    "<leader>DS",
+    function()
+      local commit = vim.fn.input("Commit: ")
+      if commit ~= "" then
+        vim.cmd('Gvdiffsplit! ' .. commit)
+      end
+    end,
+    desc = "Diff split (specific commit)",
+    mode = "n",
+  },
+  {
+    "<leader>dg",
+    function()
+      vim.cmd('Gvdiffsplit! ' .. current_commit .. ':%')
+    end,
+    desc = "Diff split (stored commit)",
+    mode = "n",
+  },
+  { "<leader>dc", close_all_fugitive_diff_windows, desc = "Close fugitive diff windows", mode = "n" },
+  { "<leader>m", group = "Merge" },
+  { "<leader>mt", ':G mergetool <CR>', desc = "Git mergetool", mode = "n" },
+})

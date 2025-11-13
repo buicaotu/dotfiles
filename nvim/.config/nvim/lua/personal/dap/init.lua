@@ -8,10 +8,18 @@ require "personal.dap.ui"
 require "personal.dap.adapters.js"
 
 -- keymaps
-vim.keymap.set('n', '<F5>', dap.continue)
-vim.keymap.set('n', '<F10>', dap.step_over)
-vim.keymap.set('n', '<F12>', dap.step_into)
-vim.keymap.set('n', '<F9>', dap.toggle_breakpoint)
-vim.keymap.set('n', '<leader><leader>b', function()
-  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
-end)
+local wk = require("which-key")
+wk.add({
+  { "<F5>", dap.continue, desc = "Continue", mode = "n" },
+  { "<F10>", dap.step_over, desc = "Step over", mode = "n" },
+  { "<F12>", dap.step_into, desc = "Step into", mode = "n" },
+  { "<F9>", dap.toggle_breakpoint, desc = "Toggle breakpoint", mode = "n" },
+  {
+    "<leader><leader>b",
+    function()
+      dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+    end,
+    desc = "Conditional breakpoint",
+    mode = "n",
+  },
+})

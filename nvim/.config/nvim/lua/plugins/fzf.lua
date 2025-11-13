@@ -56,56 +56,94 @@ return {
     vim.env.FZF_DEFAULT_COMMAND = 'fd --type file --follow --hidden --exclude .git'
     vim.g.fzf_history_dir = '~/.local/share/fzf-history'
 
-    local opts = { noremap = true, silent = true, nowait = true }
-    -- grep word under cursor
-    vim.keymap.set("n", "<leader>r", function()
-      vim.cmd.Rg(vim.fn.expand("<cword>"))
-    end, opts)
-
-    -- grep word under cursor in current directory
-    vim.keymap.set("n", "<leader>R", function()
-      vim.cmd.OilGrep(vim.fn.expand("<cword>"))
-    end, opts)
-
-    -- grep visual selected
-    vim.keymap.set("v", "<leader>r", function()
-      local selected_text = require("fzf-lua.utils").get_visual_selection()
-      vim.cmd.Rg(selected_text)
-    end, opts)
-
-    -- grep word under cursor in quickfix files
-    vim.keymap.set("n", "<leader>rf", function()
-      vim.cmd.Rf(vim.fn.expand("<cword>"))
-    end, opts)
-
-    -- grep visual selected in quickfix files
-    vim.keymap.set("v", "<leader>rf", function()
-      local selected_text = require("fzf-lua.utils").get_visual_selection()
-      vim.cmd.Rf(selected_text)
-    end, opts)
-
-    -- grep word under cursor in buffer files
-    vim.keymap.set("n", "<leader>rb", function()
-      vim.cmd.Rb(vim.fn.expand("<cword>"))
-    end, opts)
-
-    -- grep visual selected in buffer files
-    vim.keymap.set("v", "<leader>rb", function()
-      local selected_text = require("fzf-lua.utils").get_visual_selection()
-      vim.cmd.Rb(selected_text)
-    end, opts)
-
-    -- FZF keymaps
-    vim.keymap.set("n", "<leader>s", function()
-      vim.cmd.FzfLua('files')
-    end, opts)
-    vim.keymap.set("n", "<C-p>", function()
-      vim.cmd.FzfLua('buffers')
-    end, opts)
-    vim.keymap.set("n", "<leader>p", vim.cmd.FzfLua, opts)
-    vim.keymap.set("n", "<leader>lf", function()
-      vim.cmd.FzfLua('quickfix')
-    end, opts)
+    local wk = require("which-key")
+    wk.add({
+      { "<leader>r", group = "Grep/Search" },
+      {
+        "<leader>r",
+        function()
+          vim.cmd.Rg(vim.fn.expand("<cword>"))
+        end,
+        desc = "Grep word under cursor",
+        mode = "n",
+      },
+      {
+        "<leader>r",
+        function()
+          local selected_text = require("fzf-lua.utils").get_visual_selection()
+          vim.cmd.Rg(selected_text)
+        end,
+        desc = "Grep visual selection",
+        mode = "v",
+      },
+      {
+        "<leader>R",
+        function()
+          vim.cmd.OilGrep(vim.fn.expand("<cword>"))
+        end,
+        desc = "Grep in current directory",
+        mode = "n",
+      },
+      {
+        "<leader>rf",
+        function()
+          vim.cmd.Rf(vim.fn.expand("<cword>"))
+        end,
+        desc = "Grep in quickfix files",
+        mode = "n",
+      },
+      {
+        "<leader>rf",
+        function()
+          local selected_text = require("fzf-lua.utils").get_visual_selection()
+          vim.cmd.Rf(selected_text)
+        end,
+        desc = "Grep selection in quickfix",
+        mode = "v",
+      },
+      {
+        "<leader>rb",
+        function()
+          vim.cmd.Rb(vim.fn.expand("<cword>"))
+        end,
+        desc = "Grep in buffer files",
+        mode = "n",
+      },
+      {
+        "<leader>rb",
+        function()
+          local selected_text = require("fzf-lua.utils").get_visual_selection()
+          vim.cmd.Rb(selected_text)
+        end,
+        desc = "Grep selection in buffers",
+        mode = "v",
+      },
+      {
+        "<leader>s",
+        function()
+          vim.cmd.FzfLua('files')
+        end,
+        desc = "Find files",
+        mode = "n",
+      },
+      {
+        "<C-p>",
+        function()
+          vim.cmd.FzfLua('buffers')
+        end,
+        desc = "Find buffers",
+        mode = "n",
+      },
+      { "<leader>p", vim.cmd.FzfLua, desc = "FzfLua", mode = "n" },
+      {
+        "<leader>lf",
+        function()
+          vim.cmd.FzfLua('quickfix')
+        end,
+        desc = "Quickfix list",
+        mode = "n",
+      },
+    })
 
     -- todo: grep selected word/word under cursor within current folder
 

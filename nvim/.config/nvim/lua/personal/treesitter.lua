@@ -155,39 +155,49 @@ configs.setup({
 
 local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter.textobjects.repeatable_move")
 if ts_repeat_move_status then
-  -- Repeat movement with ; and ,
-  -- vim way: ; goes to the direction you were moving.
-  vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
-  vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
-
-  -- make builtin f, F, t, T also repeatable with ; and ,
-  vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
-  vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
-  vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
-  vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
+  local wk = require("which-key")
 
   -- Add buffer navigation with repeatable move
   local bnext, bprev = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("bnext") end, 
-    function() vim.cmd("bprevious") end 
+    function() vim.cmd("bnext") end,
+    function() vim.cmd("bprevious") end
   )
-  vim.keymap.set({ "n", "x", "o" }, "]t", bnext)
-  vim.keymap.set({ "n", "x", "o" }, "[t", bprev)
 
   -- Add quicklist navigation with repeatable move
   local cnext, cprev = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("cnext") end, 
-    function() vim.cmd("cprevious") end 
+    function() vim.cmd("cnext") end,
+    function() vim.cmd("cprevious") end
   )
-  vim.keymap.set({ "n", "x", "o" }, "]q", cnext)
-  vim.keymap.set({ "n", "x", "o" }, "[q", cprev)
+
   -- Quicklist stack navigation
   local colder, cnewer = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("cnewer") end, 
-    function() vim.cmd("colder") end 
+    function() vim.cmd("cnewer") end,
+    function() vim.cmd("colder") end
   )
-  vim.keymap.set({ "n", "x", "o" }, "]Q", colder)
-  vim.keymap.set({ "n", "x", "o" }, "[Q", cnewer)
+
+  wk.add({
+    -- Repeat movement with ; and ,
+    { ";", ts_repeat_move.repeat_last_move, desc = "Repeat last move", mode = { "n", "x", "o" } },
+    { ",", ts_repeat_move.repeat_last_move_opposite, desc = "Repeat last move (opposite)", mode = { "n", "x", "o" } },
+
+    -- Make builtin f, F, t, T also repeatable with ; and ,
+    { "f", ts_repeat_move.builtin_f_expr, desc = "Find char forward", mode = { "n", "x", "o" }, expr = true },
+    { "F", ts_repeat_move.builtin_F_expr, desc = "Find char backward", mode = { "n", "x", "o" }, expr = true },
+    { "t", ts_repeat_move.builtin_t_expr, desc = "Till char forward", mode = { "n", "x", "o" }, expr = true },
+    { "T", ts_repeat_move.builtin_T_expr, desc = "Till char backward", mode = { "n", "x", "o" }, expr = true },
+
+    -- Buffer navigation
+    { "]", group = "Next" },
+    { "[", group = "Previous" },
+    { "]t", bnext, desc = "Next buffer", mode = { "n", "x", "o" } },
+    { "[t", bprev, desc = "Previous buffer", mode = { "n", "x", "o" } },
+
+    -- Quickfix navigation
+    { "]q", cnext, desc = "Next quickfix item", mode = { "n", "x", "o" } },
+    { "[q", cprev, desc = "Previous quickfix item", mode = { "n", "x", "o" } },
+    { "]Q", colder, desc = "Newer quickfix list", mode = { "n", "x", "o" } },
+    { "[Q", cnewer, desc = "Older quickfix list", mode = { "n", "x", "o" } },
+  })
 else
   vim.api.nvim_err_writeln("[Error] " .. "cannot find nvim-treesitter.textobjects.repeatable_move")
 end
