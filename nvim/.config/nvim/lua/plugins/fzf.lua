@@ -20,6 +20,12 @@ local function get_buffer_files()
   return file_list
 end
 
+-- a function to check if the current buffer is in a float window
+local function is_floating_window()
+  local win_config = vim.api.nvim_win_get_config(0)
+  return win_config.relative ~= ''
+end
+
 return {
   "ibhagwan/fzf-lua",
   dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -77,14 +83,6 @@ return {
         mode = "v",
       },
       {
-        "<leader>R",
-        function()
-          vim.cmd.OilGrep(vim.fn.expand("<cword>"))
-        end,
-        desc = "Grep in current directory",
-        mode = "n",
-      },
-      {
         "<leader>rf",
         function()
           vim.cmd.Rf(vim.fn.expand("<cword>"))
@@ -134,7 +132,7 @@ return {
         desc = "Find buffers",
         mode = "n",
       },
-      { "<leader>p", vim.cmd.FzfLua, desc = "FzfLua", mode = "n" },
+      { "<leader>p", vim.cmd.FzfLua,       desc = "FzfLua", mode = "n" },
       {
         "<leader>lf",
         function()
@@ -145,18 +143,25 @@ return {
       },
     })
 
-    -- todo: grep selected word/word under cursor within current folder
-
-    -- Setup FZF Vim commands
-    -- require("fzf-lua").setup_fzfvim_cmds()
-
     -- Create :Rg command for searching
+    -- The command will search using fzf-lua's grep function
+    -- if the current buffer is an oil buffer, it will create a grep command to search within the current directory
+    -- and add the command to the command history
     vim.api.nvim_create_user_command("Rg", function(opts)
-      local search_text = table.concat(opts.fargs, " ")
+      local search = table.concat(opts.fargs, " ")
       if vim.bo.filetype == "oil" then
-        vim.cmd.OilGrep(search_text)
+        local oil = require("oil");
+        local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
+        if vim.bo.filetype == "oil" and is_floating_window() then
+          oil.close()
+        end
+        local cmd_string = string.format('FzfLua grep search=%s cwd=%s', search, dir)
+        vim.cmd(cmd_string)
+        vim.fn.histadd('cmd', cmd_string)
       else
-        require("personal.command_palette").grep(vim.fn.getcwd(), search_text)
+        require("fzf-lua").grep({
+          search = search,
+        })
       end
     end, { nargs = "*" })
 
