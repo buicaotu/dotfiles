@@ -48,19 +48,6 @@ wk.add({
     mode = "t"
   },
 
-  -- Window management
-  { "<leader>b", group = "Window and buffer" },
-  {
-    "<leader>bq",
-    function()
-      if #vim.api.nvim_list_wins() > 1 then
-        vim.cmd("q")
-      end
-    end,
-    desc = "Close window",
-    mode = "n",
-  },
-
   -- LSP Inlay hints
   {
     "<leader>h",
@@ -82,7 +69,7 @@ wk.add({
   },
 
   -- Avante
-  { "<leader>a", group = "Avante" },
+  { "<leader>a",   group = "Avante" },
   {
     "<leader>aa",
     function()

@@ -34,5 +34,6 @@ require "personal.comment"
 require "personal.lsp"
 require "personal.git"
 require "personal.dap"
+require "personal.buffer"
 
 require("personal.dprint").setup()
