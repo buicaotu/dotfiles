@@ -56,16 +56,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- Keymaps
     local wk = require("which-key")
     wk.add({
-      { "g", group = "Go to", buffer = event.buf },
-      { "gD", vim.lsp.buf.declaration, desc = "Go to declaration", buffer = event.buf, mode = "n" },
-      { "gd", vim.lsp.buf.definition, desc = "Go to definition", buffer = event.buf, mode = "n" },
-      { "K", vim.lsp.buf.hover, desc = "Hover documentation", buffer = event.buf, mode = "n" },
-      { "gi", vim.lsp.buf.implementation, desc = "Go to implementation", buffer = event.buf, mode = "n" },
-      { "gr", vim.lsp.buf.references, desc = "Go to references", buffer = event.buf, mode = "n" },
-      { "gk", vim.lsp.buf.signature_help, desc = "Signature help", buffer = event.buf, mode = "n" },
-      { "gl", vim.diagnostic.open_float, desc = "Show line diagnostics", buffer = event.buf, mode = "n" },
+      { "g",  group = "Go to",            buffer = event.buf },
+      { "gD", vim.lsp.buf.declaration,    desc = "Go to declaration",     buffer = event.buf, mode = "n" },
+      { "gd", vim.lsp.buf.definition,     desc = "Go to definition",      buffer = event.buf, mode = "n" },
+      { "K",  vim.lsp.buf.hover,          desc = "Hover documentation",   buffer = event.buf, mode = "n" },
+      { "gi", vim.lsp.buf.implementation, desc = "Go to implementation",  buffer = event.buf, mode = "n" },
+      { "gr", vim.lsp.buf.references,     desc = "Go to references",      buffer = event.buf, mode = "n" },
+      { "gk", vim.lsp.buf.signature_help, desc = "Signature help",        buffer = event.buf, mode = "n" },
+      { "gl", vim.diagnostic.open_float,  desc = "Show line diagnostics", buffer = event.buf, mode = "n" },
       {
-        "gL",
+        "<leader>ll",
         function()
           -- toggle virtual lines
           local has_virtual_lines = vim.diagnostic.config().virtual_lines ~= false
@@ -79,16 +79,33 @@ vim.api.nvim_create_autocmd('LspAttach', {
         buffer = event.buf,
         mode = "n",
       },
-      { "<leader>D", vim.lsp.buf.type_definition, desc = "Type definition", buffer = event.buf, mode = "n" },
-      { "<F2>", vim.lsp.buf.rename, desc = "Rename symbol", buffer = event.buf, mode = "n" },
-      { "<leader>c", group = "Code", buffer = event.buf },
-      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code action", buffer = event.buf, mode = "n" },
       {
-        "<leader>f",
+        "<F2>",
+        vim.lsp.buf.rename,
+        desc = "Rename symbol",
+        buffer = event.buf,
+        mode = "n"
+      },
+      {
+        "<leader>ld",
+        vim.lsp.buf.type_definition,
+        desc = "Type definition",
+        buffer = event.buf,
+        mode = "n"
+      },
+      {
+        "<leader>lca",
+        vim.lsp.buf.code_action,
+        desc = "Code action",
+        buffer = event.buf,
+        mode = "n"
+      },
+      {
+        "<leader>lf",
         function()
           vim.lsp.buf.format { async = true }
         end,
-        desc = "Format buffer",
+        desc = "Lsp Format buffer",
         buffer = event.buf,
         mode = "n",
       },
@@ -267,7 +284,7 @@ if ts_repeat_move_status then
 
   -- Map the diagnostic navigation to use repeatable_move
   wk.add({
-    { "]d", next_diagnostic, desc = "Next diagnostic", mode = "n" },
+    { "]d", next_diagnostic, desc = "Next diagnostic",     mode = "n" },
     { "[d", prev_diagnostic, desc = "Previous diagnostic", mode = "n" },
   })
 end

@@ -230,5 +230,20 @@ return {
         vim.cmd.FzfLua('files')
       end
     end, { nargs = "*", range = true })
+
+    -- Directories
+    vim.api.nvim_create_user_command("Directories", function(opts)
+      require 'fzf-lua'.fzf_exec('fd --type directory --hidden --follow --exclude .git', {
+        actions = {
+          ['default'] = function(selected)
+            -- vim.cmd('cd ' .. vim.fn.fnameescape(selected[1]))
+            vim.notify('Changed directory to ' .. selected[1], vim.log.levels.INFO)
+            local string_cmd = string.format('Oil --float %s', vim.fn.fnameescape(selected[1]))
+            vim.cmd(string_cmd)
+            vim.fn.histadd('cmd', string_cmd)
+          end,
+        },
+      })
+    end, { nargs = "*", range = true })
   end
 }
