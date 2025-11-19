@@ -22,7 +22,7 @@
   cp = cherry-pick
   cm = commit
   co = "! git fetch origin refs/heads/$1 && git switch -q -C $1 FETCH_HEAD #" # checkout the latest and match local branch to it
-  cg = "! git fetch origin refs/heads/green && git switch -q -C $1 FETCH_HEAD #" # create a new branch off green
+  cg = "! git fetch origin refs/heads/master && git switch -q -C $1 FETCH_HEAD #" # create a new branch off master
   pf = "! git push --force-with-lease #" # push force
   pu = "! git push -u #" # push upstream with default (default is current see push config below)
   l  = "! git log --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' $@ #" # log <commit> <date> <name> <comment>
@@ -32,7 +32,6 @@
   fm = "! git fetch origin refs/heads/$1 && git merge FETCH_HEAD #" # fetch and merge
   fr = "! git fetch origin refs/heads/$1 && git rebase FETCH_HEAD #" # fetch and rebase
   rsb = "! git checkout h && git fetch origin refs/heads/$1 && git reset $(git merge-base FETCH_HEAD h) #" # fetch remote and reset
-  mg = "! echo 'merge latest green' && git fetch origin refs/heads/green && git merge FETCH_HEAD --no-edit #" # fetch and merge green
   mm = "! echo 'merge latest master' && git fetch origin refs/heads/master && git merge FETCH_HEAD --no-edit #" # fetch and merge master
   cdiff = "! git diff --diff-filter=U --name-only"
   clean-all = "! git reset --hard && git clean -df"
