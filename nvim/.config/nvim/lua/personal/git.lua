@@ -61,8 +61,31 @@ local function diff_specific_commit(commit)
   create_qflist('Diff ' .. commit, list)
 end
 
+local function find_merge_base(base)
+  base = base ~= nil and base or 'origin/master'
+  local commit = nil
+  Job:new({
+    command = 'git',
+    args = { 'merge-base', base, 'h' },
+    on_stdout = function(err, data)
+      if err == nil and data ~= nil then
+        commit = data
+        return
+      end
+      error('git commit not found ' .. err)
+    end,
+  }):sync()
+  return commit
+end
+
 vim.api.nvim_create_user_command('DiffCommit', function(opts)
   diff_specific_commit(opts.args)
+end, { nargs = 1 })
+
+vim.api.nvim_create_user_command('DiffBaseCommit', function(opts)
+  local commit = opts.args
+  local base = find_merge_base(commit)
+  diff_specific_commit(base)
 end, { nargs = 1 })
 
 -- git-fugitive keymaps
@@ -117,7 +140,7 @@ wk.add({
   },
   {
     "<leader>dm",
-    ':DiffCommit origin/master<CR>',
+    ':DiffBaseCommit origin/master<CR>',
     desc = "Diff master",
     mode = "n"
   },
