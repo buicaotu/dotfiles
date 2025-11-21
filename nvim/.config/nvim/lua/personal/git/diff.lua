@@ -14,11 +14,15 @@ local function starts_with(str, prefix)
   return str:sub(1, #prefix) == prefix
 end
 
-local function git_diff(commit)
-  return job_runner.run({
+local function get_git_root()
+  local result = job_runner.run({
     command = 'git',
-    args = { 'diff', commit, '--relative', '--name-only' },
+    args = { 'rev-parse', '--show-toplevel' },
   })
+  if not result[1] or result[1] == '' then
+    error('failed to resolve git root')
+  end
+  return result[1]
 end
 
 local function create_qflist(title, list)
@@ -54,8 +58,17 @@ end
 
 function M.diff_specific_commit(commit)
   M.set_current_commit(commit)
-  local list = git_diff(commit)
-  create_qflist('Diff ' .. commit, list)
+  local git_root = get_git_root()
+  local list = job_runner.run({
+    command = 'git',
+    args = { '-C', git_root, 'diff', commit, '--name-only' },
+  })
+  local relative_list = {}
+  for i, path in ipairs(list) do
+    local abs_path = git_root .. '/' .. path
+    relative_list[i] = vim.fn.fnamemodify(abs_path, ':p:.')
+  end
+  create_qflist('Diff ' .. commit, relative_list)
 end
 
 function M.find_merge_base(base)
