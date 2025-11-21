@@ -189,12 +189,12 @@ wk.add({
   {
     "<leader>bco",
     close_all_other_buffers,
-    desc = "close all buffers",
+    desc = "close all other buffers",
   },
   {
     "<leader>bcf",
     force_close_all_buffers,
-    desc = "close all buffers",
+    desc = "force close all buffers",
   },
   {
     "<leader>byy",
