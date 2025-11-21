@@ -3,7 +3,7 @@ local M = {}
 local job_runner = require('personal.job')
 
 local ORIGIN_PREFIX = 'origin/'
-local ORIGIN_STALE_THRESHOLD_SECONDS = 4 * 60 * 60
+local ORIGIN_STALE_THRESHOLD_SECONDS = 2 * 60 * 60
 local recently_fetched_refs = {}
 local current_commit = 'origin/master'
 
@@ -75,10 +75,7 @@ function M.maybe_fetch_stale_origin_branch(ref, update_message)
     return
   end
   local now = os.time()
-  local last_fetch = recently_fetched_refs[ref]
-  if last_fetch and os.difftime(now, last_fetch) <= ORIGIN_STALE_THRESHOLD_SECONDS then
-    return
-  end
+  -- We only consider fetching when the tracked commit on origin looks stale.
   local branch = string.sub(ref, #ORIGIN_PREFIX + 1)
   if branch == '' then
     return
@@ -98,6 +95,13 @@ function M.maybe_fetch_stale_origin_branch(ref, update_message)
   end
   local age_seconds = os.difftime(now, timestamp)
   if age_seconds <= ORIGIN_STALE_THRESHOLD_SECONDS then
+    return
+  end
+  -- last_fetch remains a secondary safeguard; even if the commit is old,
+  -- skip the fetch when we already hit origin recently because we know
+  -- that another fetch won't bring in much more new commits yet.
+  local last_fetch = recently_fetched_refs[ref]
+  if last_fetch and os.difftime(now, last_fetch) <= ORIGIN_STALE_THRESHOLD_SECONDS then
     return
   end
   if update_message then
