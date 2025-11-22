@@ -62,3 +62,12 @@ To add a new configuration:
 1. Create a new directory in the root of this repo
 2. Mirror the directory structure from your home directory
 3. Run `stow <new-directory>` to create the symlinks
+
+### Using common zsh
+
+add the following line to your `~/.zshrc` to source a common zsh configuration file:
+
+```bash
+common_zsh=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/common.zsh
+[[ -f $common_zsh ]] && source $common_zsh
+```
