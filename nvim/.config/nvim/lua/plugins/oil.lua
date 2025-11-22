@@ -23,8 +23,6 @@ return {
         desc = "Toggle Oil file explorer",
         mode = "n",
       },
-      { "<leader>o",  group = "Oil" },
-      { "<leader>of", ":OilFiles<CR>", desc = "Oil files", mode = "n" },
     })
 
     -- Redefine 'Browse' as oil.nvim disable netrw
