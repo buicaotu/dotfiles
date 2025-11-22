@@ -1,9 +1,3 @@
--- a function to check if the current buffer is in a float window
-local function is_floating_window()
-  local win_config = vim.api.nvim_win_get_config(0)
-  return win_config.relative ~= ''
-end
-
 return {
   "stevearc/oil.nvim",
   opts = {
@@ -19,17 +13,6 @@ return {
     }
   },
   init = function()
-    -- open fzf files of the current directory
-    vim.api.nvim_create_user_command("OilFiles", function()
-      local oil = require("oil");
-      local dir = oil.get_current_dir() or vim.fn.expand("%:p:h")
-      if vim.bo.filetype == "oil" then
-        oil.close()
-      end
-      require("personal.command_palette").files(dir)
-    end, {})
-
-
     local wk = require("which-key")
     wk.add({
       {

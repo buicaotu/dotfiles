@@ -59,6 +59,7 @@ return {
   { "tpope/vim-fugitive" },
   { "tpope/vim-rhubarb" },
   { "tpope/vim-dispatch" },
+  { dir = "~/proj/ghpr.nvim", name = "ghpr.nvim" },
 
   -- UI
   { 'j-hui/fidget.nvim',     opts = {} },
