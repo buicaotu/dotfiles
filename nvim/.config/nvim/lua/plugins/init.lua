@@ -62,8 +62,8 @@ return {
   { dir = "~/proj/ghpr.nvim", name = "ghpr.nvim" },
 
   -- UI
-  { 'j-hui/fidget.nvim',     opts = {} },
-  { 'echasnovski/mini.move', version = false, opts = {} },
+  { 'j-hui/fidget.nvim',      opts = {} },
+  { 'echasnovski/mini.move',  version = false,   opts = {} },
 
   -- Editing
   { "tpope/vim-surround" },
@@ -84,6 +84,21 @@ return {
   { 'rhysd/conflict-marker.vim' },
   { 'JoosepAlviste/nvim-ts-context-commentstring' },
   { 'lukas-reineke/indent-blankline.nvim' },
+  {
+    'chrishrb/gx.nvim',
+    keys = {
+      { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } }
+    },
+    cmd = { "Browse" },
+    init = function()
+      vim.g.netrw_nogx = 1
+    end,
+    opts = {
+      handlers = {
+        search = false,
+      },
+    },
+  },
 
   -- Rust
   {
