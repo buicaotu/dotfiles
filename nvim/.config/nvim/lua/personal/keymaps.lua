@@ -68,33 +68,6 @@ wk.add({
     replace_keycodes = false
   },
 
-  -- Avante
-  { "<leader>a",   group = "Avante" },
-  {
-    "<leader>aa",
-    function()
-      require("avante.api").ask()
-    end,
-    desc = "Ask Avante",
-    mode = { "n", "v" },
-  },
-  {
-    "<leader>ar",
-    function()
-      require("avante.api").refresh()
-    end,
-    desc = "Refresh Avante",
-    mode = "v",
-  },
-  {
-    "<leader>ae",
-    function()
-      require("avante.api").edit()
-    end,
-    desc = "Edit with Avante",
-    mode = { "n", "v" },
-  },
-
   -- Special characters from wezterm
   { "<Char-0xAA>", "<cmd>write<cr>",      desc = "Save file",            mode = "n" },
   { "<Char-0xAB>", 'y<cmd>let @+=@0<CR>', desc = "Copy to clipboard",    mode = "v" },
