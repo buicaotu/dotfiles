@@ -146,6 +146,14 @@ return {
         mode = "n",
       },
       {
+        "<A-p>",
+        function()
+          vim.cmd.FzfLua('global')
+        end,
+        desc = "Fzf global",
+        mode = "n",
+      },
+      {
         "<leader>p",
         vim.cmd.FzfLua,
         desc = "FzfLua",
