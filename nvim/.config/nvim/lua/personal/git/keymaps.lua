@@ -4,18 +4,29 @@ local diff = require('personal.git.diff')
 local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
 local wk = require('which-key')
 
+local function is_fugitive_buf(buf)
+  local name = vim.api.nvim_buf_get_name(buf)
+  return name:match('^fugitive://') ~= nil
+end
+
 local function close_all_fugitive_diff_windows()
   local wins = vim.api.nvim_tabpage_list_wins(0)
+  local fugitive_bufs = {}
+  -- collecting all fugitive buffers
   for _, win in ipairs(wins) do
     local buf = vim.api.nvim_win_get_buf(win)
-    local bufname = vim.api.nvim_buf_get_name(buf)
-    if bufname:match('fugitive://') then
-      if #wins == 1 then
-        vim.api.nvim_buf_delete(buf, { force = false })
-      else
-        vim.api.nvim_win_close(win, false)
-      end
+    if is_fugitive_buf(buf) then
+      fugitive_bufs[buf] = true
     end
+  end
+  -- closing all fugitive buffers
+  for buf, _ in pairs(fugitive_bufs) do
+    pcall(vim.api.nvim_buf_delete, buf, { force = true })
+  end
+  -- making sure alternate buffer is not fugitive
+  local alt_buf = vim.fn.bufnr('#')
+  if alt_buf ~= -1 and is_fugitive_buf(alt_buf) then
+    pcall(vim.api.nvim_buf_delete, alt_buf, { force = true })
   end
 end
 
