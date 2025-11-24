@@ -10,10 +10,10 @@ return {
       -- remove original keymapping
       ['<C-p>'] = false, -- preview
       ['<C-h>'] = false, -- split
-    }
-  },
-  view_options = {
-    show_hidden = true,
+    },
+    view_options = {
+      show_hidden = true,
+    },
   },
   init = function()
     local wk = require("which-key")
