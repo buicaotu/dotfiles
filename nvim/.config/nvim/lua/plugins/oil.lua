@@ -14,6 +14,9 @@ return {
     view_options = {
       show_hidden = true,
     },
+    float = {
+      border = "rounded",
+    },
   },
   init = function()
     local wk = require("which-key")
