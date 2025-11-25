@@ -1,6 +1,11 @@
-local lspconfig = require('lspconfig')
 local lspformat = require('lsp-format')
+local lsp_util = require('lspconfig.util')
+local cmp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 lspformat.setup({})
+
+vim.lsp.config('*', {
+  capabilities = cmp_capabilities,
+})
 
 -- Diagnostics
 local virtual_configs = {
@@ -39,14 +44,7 @@ wk.add({
   },
 })
 
--- Add cmp_nvim_lsp capabilities settings to lspconfig
--- This should be executed before you configure any language server
-local lspconfig_defaults = lspconfig.util.default_config
-lspconfig_defaults.capabilities = vim.tbl_deep_extend(
-  'force',
-  lspconfig_defaults.capabilities,
-  require('cmp_nvim_lsp').default_capabilities()
-)
+-- Capabilities are set globally via vim.lsp.config('*') above.
 
 -- This is where you enable features that only work
 -- if there is a language server active in the file
@@ -110,75 +108,91 @@ vim.api.nvim_create_autocmd('LspAttach', {
         mode = "n",
       },
     })
+
+    local client = event.data and vim.lsp.get_client_by_id(event.data.client_id)
+    if client and (client.name == "ts_ls" or client.name == "tsgo") then
+      -- Prefer external formatters (efm/prettier/eslint) over ts language servers.
+      client.server_capabilities.documentFormattingProvider = false
+    end
   end
 })
 
 -- Setup mason
 require('mason').setup({})
 require("mason-lspconfig").setup({
-  ensure_installed = { "ts_ls", "eslint", "efm", "jdtls" },
+  ensure_installed = { "ts_ls", "tsgo", "eslint", "efm", "jdtls" },
   automatic_installation = true,
-  handlers = {
-    function(server_name)
-      lspconfig[server_name].setup({})
-    end,
-    jdtls = function()
-      -- Custom handler for jdtls to ensure it's properly configured
-      lspconfig.jdtls.setup({
-        cmd = {
-          "/opt/homebrew/opt/openjdk@21/bin/java",
-          "-Dlog.level=WARN",
-          "--add-opens=java.base/java.lang=ALL-UNNAMED",
-          "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-          "--add-opens=java.base/java.io=ALL-UNNAMED",
-          "--add-opens=java.base/java.util=ALL-UNNAMED",
-          "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
-          "-jar", vim.fn.glob(vim.fn.stdpath("data") ..
-          "/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
-          "-configuration", vim.fn.stdpath("data") .. "/mason/packages/jdtls/config_mac",
-          "-data", vim.fn.stdpath("cache") .. "/jdtls/workspace"
+})
+
+local eslint_base_cfg = vim.deepcopy(vim.lsp.config.eslint or {})
+local eslint_base_on_attach = eslint_base_cfg.on_attach
+vim.lsp.config('eslint', vim.tbl_extend("force", eslint_base_cfg, {
+  on_attach = function(client, bufnr)
+    if eslint_base_on_attach then
+      eslint_base_on_attach(client, bufnr)
+    end
+    local group = vim.api.nvim_create_augroup("eslint_fix_all_" .. bufnr, { clear = true })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      group = group,
+      command = "LspEslintFixAll",
+    })
+  end,
+}))
+
+vim.lsp.config('jdtls', {
+  cmd = {
+    "/opt/homebrew/opt/openjdk@21/bin/java",
+    "-Dlog.level=WARN",
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.io=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+    "-jar", vim.fn.glob(vim.fn.stdpath("data") ..
+    "/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
+    "-configuration", vim.fn.stdpath("data") .. "/mason/packages/jdtls/config_mac",
+    "-data", vim.fn.stdpath("cache") .. "/jdtls/workspace"
+  },
+  settings = {
+    java = {
+      maven = {
+        downloadSources = true,
+        updateSnapshots = true,
+      },
+      saveActions = {
+        organizeImports = true,
+      },
+      completion = {
+        favoriteStaticMembers = {
+          "org.junit.jupiter.api.Assertions.*",
+          "org.junit.jupiter.api.Assumptions.*",
+          "org.mockito.Mockito.*",
+          "org.mockito.ArgumentMatchers.*",
         },
-        settings = {
-          java = {
-            maven = {
-              downloadSources = true,
-              updateSnapshots = true,
-            },
-            saveActions = {
-              organizeImports = true,
-            },
-            completion = {
-              favoriteStaticMembers = {
-                "org.junit.jupiter.api.Assertions.*",
-                "org.junit.jupiter.api.Assumptions.*",
-                "org.mockito.Mockito.*",
-                "org.mockito.ArgumentMatchers.*",
-              },
-              importOrder = {
-                "java",
-                "javax",
-                "com",
-                "org",
-              },
-            },
-          },
+        importOrder = {
+          "java",
+          "javax",
+          "com",
+          "org",
         },
-      })
-    end,
+      },
+    },
   },
 })
 
-lspconfig.eslint.setup({
-  on_attach = function(client, bufnr)
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      command = "EslintFixAll",
-    })
-  end,
-})
+vim.lsp.config('denols', {
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    if fname == "" then
+      return
+    end
 
-lspconfig.denols.setup({
-  root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+    local root = lsp_util.root_pattern("deno.json", "deno.jsonc")(fname)
+    if root then
+      on_dir(root)
+    end
+  end,
   init_options = {
     enable = true,
     lint = true,
@@ -187,31 +201,61 @@ lspconfig.denols.setup({
   }
 })
 
-lspconfig.ts_ls.setup({
-  on_attach = function(client)
-    client.server_capabilities.documentFormattingProvider = false
-  end,
-  single_file_support = false,
-  root_dir = function(fname)
-    local deno_root = lspconfig.util.root_pattern("deno.json", "deno.jsonc")(fname)
-    if deno_root then
-      return nil -- Return nil to tell tsserver not to attach in Deno projects
-    end
-    return lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json")(fname)
-  end,
+local ts_inlay_prefs = {
+  includeInlayParameterNameHints = 'all',
+  includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+  includeInlayFunctionParameterTypeHints = true,
+  includeInlayVariableTypeHints = true,
+  includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+  includeInlayPropertyDeclarationTypeHints = true,
+  includeInlayFunctionLikeReturnTypeHints = true,
+  includeInlayEnumMemberValueHints = true,
+}
+
+local function ts_root_dir(bufnr, on_dir)
+  local root_markers = { "package.json", "tsconfig.json", "jsconfig.json" }
+  local deno_path = vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc', 'deno.lock' })
+  local project_root = vim.fs.root(bufnr, root_markers)
+  if deno_path and (not project_root or #deno_path >= #project_root) then
+    return
+  end
+  -- We fallback to the current working directory if no project root is found
+  on_dir(project_root or vim.fn.getcwd())
+end
+
+vim.lsp.config('ts_ls', {
   init_options = {
-    preferences = {
-      includeInlayParameterNameHints = 'all',
-      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-      includeInlayFunctionParameterTypeHints = true,
-      includeInlayVariableTypeHints = true,
-      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-      includeInlayPropertyDeclarationTypeHints = true,
-      includeInlayFunctionLikeReturnTypeHints = true,
-      includeInlayEnumMemberValueHints = true,
-    },
+    preferences = ts_inlay_prefs,
   },
+  root_dir = ts_root_dir,
 })
+
+vim.lsp.config('tsgo', {
+  init_options = {
+    preferences = ts_inlay_prefs,
+  },
+  root_dir = ts_root_dir,
+})
+
+-- Keep tsgo disabled by default; enable manually with vim.lsp.enable('tsgo')
+vim.lsp.enable('tsgo', false)
+vim.api.nvim_create_user_command("LspSwitchTs", function()
+  local ts_ls_enabled = vim.lsp.is_enabled("ts_ls")
+
+  if ts_ls_enabled then
+    vim.lsp.enable("ts_ls", false)
+    vim.lsp.enable("tsgo", true)
+    vim.notify("Switched to tsgo (ts_ls disabled)", vim.log.levels.INFO)
+  else
+    vim.lsp.enable("tsgo", false)
+    vim.lsp.enable("ts_ls", true)
+    vim.notify("Switched to ts_ls (tsgo disabled)", vim.log.levels.INFO)
+  end
+
+  if vim.v.vim_did_enter == 1 then
+    vim.cmd.doautoall('nvim.lsp.enable FileType')
+  end
+end, { desc = "Toggle between ts_ls and tsgo LSPs" })
 
 local prettier = {
   formatCommand = "./node_modules/.bin/prettier --stdin-filepath ${INPUT}",
@@ -231,15 +275,22 @@ else
 end
 
 -- Set up efm-langserver
-lspconfig.efm.setup {
-  on_attach = function(client)
+vim.lsp.config('efm', {
+  on_attach = function(client, bufnr)
     if client.server_capabilities.documentFormattingProvider then
-      vim.api.nvim_command('autocmd BufWritePre <buffer> lua vim.lsp.buf.format()')
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format()
+        end,
+      })
     end
   end,
   init_options = { documentFormatting = not work_dir },
-  root_dir = function(fname)
-    return lspconfig.util.root_pattern('.prettierrc', '.prettierrc.js', '.git')(fname) or vim.loop.cwd()
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local root = fname ~= "" and lsp_util.root_pattern('.prettierrc', '.prettierrc.js', '.git')(fname) or nil
+    on_dir(root or vim.uv.cwd())
   end,
   settings = {
     rootMarkers = { ".prettierrc", ".prettierrc.js", "dprint.json" },
@@ -255,9 +306,9 @@ lspconfig.efm.setup {
   },
   filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
   timeout_ms = 10000,
-}
+})
 
-lspconfig.lua_ls.setup({
+vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       runtime = { version = 'LuaJIT' },
@@ -267,6 +318,8 @@ lspconfig.lua_ls.setup({
     },
   },
 })
+
+vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls' })
 
 -- Diagnostic navigation with repeat support
 local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter.textobjects.repeatable_move")
