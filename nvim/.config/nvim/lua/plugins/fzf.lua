@@ -55,7 +55,7 @@ local function grep(opts, grep_opts)
       oil.close()
     end
     local grep_opts_string = grep_opts.no_esc and "no_esc=true" or ""
-    local cmd_string = string.format('FzfLua grep search=%s cwd=%s %s', search_text, dir, grep_opts_string)
+    local cmd_string = string.format('FzfLua grep search=%s cwd=%s %s', search_text:gsub(" ", "\\ "), dir, grep_opts_string)
     vim.cmd(cmd_string)
     vim.fn.histadd('cmd', cmd_string)
   else
@@ -95,8 +95,16 @@ return {
       glob_separator = "%s%-%-", -- query separator pattern (lua): ' --'
       -- adding "--with-filename" to the default grep rg_opts
       rg_opts = "--column --line-number --no-heading --with-filename --color=always --smart-case --max-columns=4096 -e"
+    },
+    olfildes = {
+      include_current_session = false,
     }
   },
+  config = function(_, opts)
+    local fzflua = require("fzf-lua")
+    fzflua.setup(opts)
+    fzflua.register_ui_select()
+  end,
   init = function()
     -- FZF settings
     vim.env.FZF_DEFAULT_COMMAND = 'fd --type file --follow --hidden --exclude .git'
@@ -166,6 +174,22 @@ return {
         end,
         desc = "Quickfix list",
         mode = "n",
+      },
+      {
+        "<C-x><C-f>",
+        function()
+          vim.cmd.FzfLua('complete_path')
+        end,
+        desc = "Fzf complete path",
+        mode = { "i", "n", "v" },
+      },
+      {
+        "<C-x><C-r>",
+        function()
+          vim.cmd.FzfLua('registers')
+        end,
+        desc = "Fzf complete register",
+        mode = { "i", "n", "v" },
       },
     })
 
