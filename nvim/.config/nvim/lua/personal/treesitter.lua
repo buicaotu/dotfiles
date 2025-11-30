@@ -153,27 +153,34 @@ configs.setup({
   modules = {},
 })
 
-local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter.textobjects.repeatable_move")
+local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter-textobjects.repeatable_move")
 if ts_repeat_move_status then
   local wk = require("which-key")
 
-  -- Add buffer navigation with repeatable move
-  local bnext, bprev = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("bnext") end,
-    function() vim.cmd("bprevious") end
-  )
+  -- Helpers to wrap simple commands in the new repeatable move signature
+  local bmove = ts_repeat_move.make_repeatable_move(function(opts)
+    if opts.forward then
+      vim.cmd("bnext")
+    else
+      vim.cmd("bprevious")
+    end
+  end)
 
-  -- Add quicklist navigation with repeatable move
-  local cnext, cprev = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("Cnext") end,
-    function() vim.cmd("Cprev") end
-  )
+  local cqmove = ts_repeat_move.make_repeatable_move(function(opts)
+    if opts.forward then
+      vim.cmd("Cnext")
+    else
+      vim.cmd("Cprev")
+    end
+  end)
 
-  -- Quicklist stack navigation
-  local colder, cnewer = ts_repeat_move.make_repeatable_move_pair(
-    function() vim.cmd("colder") end,
-    function() vim.cmd("cnewer") end
-  )
+  local cqstack = ts_repeat_move.make_repeatable_move(function(opts)
+    if opts.forward then
+      vim.cmd("cnewer")
+    else
+      vim.cmd("colder")
+    end
+  end)
 
   wk.add({
     -- Repeat movement with ; and ,
@@ -189,14 +196,14 @@ if ts_repeat_move_status then
     -- Buffer navigation
     { "]",  group = "Next" },
     { "[",  group = "Previous" },
-    { "]t", bnext,                                    desc = "Next buffer",                 mode = { "n", "x", "o" } },
-    { "[t", bprev,                                    desc = "Previous buffer",             mode = { "n", "x", "o" } },
+    { "]t", function() bmove({ forward = true }) end, desc = "Next buffer",                 mode = { "n", "x", "o" } },
+    { "[t", function() bmove({ forward = false }) end, desc = "Previous buffer",             mode = { "n", "x", "o" } },
 
     -- Quickfix navigation
-    { "]q", cnext,                                    desc = "Next quickfix item",          mode = { "n", "x", "o" } },
-    { "[q", cprev,                                    desc = "Previous quickfix item",      mode = { "n", "x", "o" } },
-    { "]Q", colder,                                   desc = "Newer quickfix list",         mode = { "n", "x", "o" } },
-    { "[Q", cnewer,                                   desc = "Older quickfix list",         mode = { "n", "x", "o" } },
+    { "]q", function() cqmove({ forward = true }) end, desc = "Next quickfix item",          mode = { "n", "x", "o" } },
+    { "[q", function() cqmove({ forward = false }) end, desc = "Previous quickfix item",      mode = { "n", "x", "o" } },
+    { "]Q", function() cqstack({ forward = true }) end, desc = "Newer quickfix list",         mode = { "n", "x", "o" } },
+    { "[Q", function() cqstack({ forward = false }) end, desc = "Older quickfix list",         mode = { "n", "x", "o" } },
   })
 else
   vim.api.nvim_err_writeln("[Error] " .. "cannot find nvim-treesitter.textobjects.repeatable_move")

@@ -120,7 +120,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- Setup mason
 require('mason').setup({})
 require("mason-lspconfig").setup({
-  ensure_installed = { "ts_ls", "tsgo", "eslint", "efm", "jdtls" },
+  ensure_installed = { "ts_ls", "tsgo", "eslint", "efm" },
+  automatic_enable = false,
   automatic_installation = true,
 })
 

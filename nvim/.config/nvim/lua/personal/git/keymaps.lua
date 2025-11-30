@@ -1,7 +1,7 @@
 local M = {}
 
 local diff = require('personal.git.diff')
-local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
+local ts_repeat_move = require('nvim-treesitter-textobjects.repeatable_move')
 local wk = require('which-key')
 
 local function is_fugitive_buf(buf)
@@ -31,23 +31,20 @@ local function close_all_fugitive_diff_windows()
 end
 
 local function make_diff_moves()
-  local diff_next, diff_prev = ts_repeat_move.make_repeatable_move_pair(
-    function()
-      close_all_fugitive_diff_windows()
+  local diff_move = ts_repeat_move.make_repeatable_move(function(opts)
+    close_all_fugitive_diff_windows()
+    if opts.forward then
       vim.cmd('Cnext')
-      vim.cmd('Gvdiffsplit! ' .. diff.get_current_commit() .. ':%')
-    end,
-    function()
-      close_all_fugitive_diff_windows()
+    else
       vim.cmd('Cprev')
-      vim.cmd('Gvdiffsplit! ' .. diff.get_current_commit() .. ':%')
     end
-  )
-  return diff_next, diff_prev
+    vim.cmd('Gvdiffsplit! ' .. diff.get_current_commit() .. ':%')
+  end)
+  return diff_move
 end
 
 local function register_keymaps()
-  local diff_next, diff_prev = make_diff_moves()
+  local diff_move = make_diff_moves()
   wk.add({
     { "<leader>d",  group = "Diff/Debug" },
     { "<leader>dt", ':G! difftool --name-only<CR>', desc = "Difftool (working dir)", mode = "n" },
@@ -109,13 +106,13 @@ local function register_keymaps()
     { "<leader>mt", ':G mergetool <CR>',             desc = "Git mergetool",               mode = "n" },
     {
       "]r",
-      diff_next,
+      function() diff_move({ forward = true }) end,
       desc = "Next diff view",
       mode = { "n", "x", "o" }
     },
     {
       "[r",
-      diff_prev,
+      function() diff_move({ forward = false }) end,
       desc = "Previous diff view",
       mode = { "n", "x", "o" }
     },
