@@ -323,22 +323,13 @@ vim.lsp.config('lua_ls', {
 vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls' })
 
 -- Diagnostic navigation with repeat support
-local ts_repeat_move_status, ts_repeat_move = pcall(require, "nvim-treesitter.textobjects.repeatable_move")
-if ts_repeat_move_status then
-  -- Register the diagnostic navigation functions with repeatable_move
-  local next_diagnostic, prev_diagnostic = ts_repeat_move.make_repeatable_move_pair(
-  -- maybe set severity to min = WARN.
-    function()
-      vim.diagnostic.jump({ count = 1, float = false })
-    end,
-    function()
-      vim.diagnostic.jump({ count = -1, float = false })
-    end
-  )
+local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
+-- Wrap diagnostic jump with new repeatable move signature
+local diagnostic_move = ts_repeat_move.make_repeatable_move(function(opts)
+  vim.diagnostic.jump({ count = opts.forward and 1 or -1, float = false })
+end)
 
-  -- Map the diagnostic navigation to use repeatable_move
-  wk.add({
-    { "]d", next_diagnostic, desc = "Next diagnostic",     mode = "n" },
-    { "[d", prev_diagnostic, desc = "Previous diagnostic", mode = "n" },
-  })
-end
+wk.add({
+  { "]d", function() diagnostic_move({ forward = true }) end,  desc = "Next diagnostic",     mode = "n" },
+  { "[d", function() diagnostic_move({ forward = false }) end, desc = "Previous diagnostic", mode = "n" },
+})

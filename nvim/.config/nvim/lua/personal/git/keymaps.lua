@@ -1,7 +1,7 @@
 local M = {}
 
 local diff = require('personal.git.diff')
-local ts_repeat_move = require('nvim-treesitter-textobjects.repeatable_move')
+local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 local wk = require('which-key')
 
 local function is_fugitive_buf(buf)
