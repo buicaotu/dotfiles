@@ -1,17 +1,13 @@
 return {
   "folke/sidekick.nvim",
   opts = {
-    -- add any options here
-    -- cli = {
-    --   mux = {
-    --     backend = "tmux",
-    --     enabled = true,
-    --   },
-    -- },
+    nes = {
+      enabled = true,
+    },
+    cli = {
+      picker = 'fzf-lua',
+    },
   },
-  init = function()
-    vim.g.sidekick_auto_open = true
-  end,
   keys = {
     {
       "<c-,>",
@@ -68,6 +64,12 @@ return {
       function() require("sidekick.cli").prompt() end,
       mode = { "n", "x" },
       desc = "Sidekick Select Prompt",
+    },
+    {
+      "<leader>an",
+      function() require("sidekick.nes").update() end,
+      mode = { "n" },
+      desc = "Sidekick NES Update Suggestions",
     },
     {
       "<leader>acl",
