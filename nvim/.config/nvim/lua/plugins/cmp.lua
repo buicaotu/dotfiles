@@ -66,7 +66,10 @@ return {
           { name = 'nvim_lsp_document_symbol' }
         }, {
           { name = 'buffer' }
-        })
+        }),
+        completion = {
+          completeopt = 'menu,menuone,noinsert,noselect'
+        }
       })
 
       cmp.setup.cmdline(':', {
