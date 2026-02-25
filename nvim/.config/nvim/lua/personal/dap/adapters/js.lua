@@ -1,24 +1,20 @@
-local status_ok, dapjs = pcall(require, "dap-vscode-js")
+local status_ok, dap = pcall(require, "dap")
 if not status_ok then
 	return
 end
 
--- todo: need more setup
+local js_debug_server = vim.fn.expand("~/.local/share/nvim/lazy/vscode-js-debug/out/src/vsDebugServer.js")
 
-dapjs.setup({
-  adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
-  -- node_path = "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
-  -- debugger_path = "(runtimedir)/site/pack/packer/opt/vscode-js-debug", -- Path to vscode-js-debug installation.
-  debugger_path = vim.fn.expand("~/.local/share/nvim/lazy/vscode-js-debug"), -- Path to vscode-js-debug installation.
-  -- debugger_cmd = { "js-debug-adapter" }, -- Command to use to launch the debug server. Takes precedence over `node_path` and `debugger_path`.
-  -- log_file_path = "(stdpath cache)/dap_vscode_js.log", -- Path for file logging
-  -- log_file_level = false, -- Logging level for output to file. Set to false to disable file logging.
-  -- log_console_level = vim.log.levels.ERROR, -- Logging level for output to console. Set to false to disable console output.
-})
-
-local status_ok, dap = pcall(require, "dap")
-if not status_ok then
-	return
+for _, adapter_type in ipairs({ "pwa-node", "pwa-chrome" }) do
+  dap.adapters[adapter_type] = {
+    type = "server",
+    host = "localhost",
+    port = "${port}",
+    executable = {
+      command = "node",
+      args = { js_debug_server, "${port}" },
+    },
+  }
 end
 
 -- "javascript" 

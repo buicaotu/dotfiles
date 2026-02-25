@@ -52,6 +52,7 @@
   detachedHead = false
 [trace2]
 	eventTarget = af_unix:dgram:/tmp/olly-git-trace2.sock
+	configparams = remote.origin.url
 [rerere]
 	enabled = true
 ; [column]

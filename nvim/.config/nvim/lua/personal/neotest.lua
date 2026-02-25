@@ -1,3 +1,14 @@
+local wk = require("which-key")
+local jest_debug = require("personal.jest-debug")
+wk.add({
+  { "<leader>t", group = "Test" },
+  { "<leader>to", ':lua open_test_window()<CR>', desc = "Open test output", mode = "n" },
+  { "<leader>tt", ':lua run_nearest_test()<CR>', desc = "Run nearest test", mode = "n" },
+  { "<leader>ta", ':lua run_current_file()<CR>', desc = "Run all tests in file", mode = "n" },
+  { "<leader>td", jest_debug.debug_nearest, desc = "Debug nearest test", mode = "n" },
+})
+
+
 local status_ok, neotest = pcall(require, "neotest")
 if not status_ok then
   return
@@ -38,14 +49,3 @@ end
 function run_current_file()
   neotest.run.run(vim.fn.expand("%"))
 end
---
---
--- ~/.local/share/nvim/site/pack/packer/start
-
-local wk = require("which-key")
-wk.add({
-  { "<leader>t", group = "Test" },
-  { "<leader>to", ':lua open_test_window()<CR>', desc = "Open test output", mode = "n" },
-  { "<leader>tt", ':lua run_nearest_test()<CR>', desc = "Run nearest test", mode = "n" },
-  { "<leader>ta", ':lua run_current_file()<CR>', desc = "Run all tests in file", mode = "n" },
-})
