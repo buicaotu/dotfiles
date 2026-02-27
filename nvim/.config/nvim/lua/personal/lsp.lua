@@ -119,6 +119,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 -- Setup mason
 require('mason').setup({})
+
+local mr = require('mason-registry')
+if not mr.is_installed('js-debug-adapter') then
+  local pkg = mr.get_package('js-debug-adapter')
+  pkg:install({ version = 'v1.110.0' })
+end
+
 require("mason-lspconfig").setup({
   ensure_installed = { "ts_ls", "tsgo", "eslint", "efm" },
   automatic_enable = false,
