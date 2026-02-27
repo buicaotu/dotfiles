@@ -3,8 +3,6 @@ if not status_ok then
 	return
 end
 
-local js_debug_server = vim.fn.expand("~/.local/share/nvim/lazy/vscode-js-debug/out/src/vsDebugServer.js")
-
 for _, adapter_type in ipairs({ "node", "chrome" }) do
   local pwa_type = "pwa-" .. adapter_type
   dap.adapters[pwa_type] = {
@@ -13,7 +11,10 @@ for _, adapter_type in ipairs({ "node", "chrome" }) do
     port = "${port}",
     executable = {
       command = "node",
-      args = { js_debug_server, "${port}" },
+      args = {
+        vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
+        "${port}"
+      },
     },
   }
   -- this allow us to handle launch.json configurations
@@ -30,7 +31,6 @@ for _, adapter_type in ipairs({ "node", "chrome" }) do
     end
   end
 end
-
 -- "javascript" 
 for _, language in ipairs({ "typescript" }) do
   dap.configurations[language] = {
@@ -38,10 +38,10 @@ for _, language in ipairs({ "typescript" }) do
       type = "pwa-node",
       request = "launch",
       name = "Debug Jest Tests - " .. language,
-      -- trace = true, -- include debugger info
+      trace = true, -- include debugger info
       runtimeExecutable = "node",
       runtimeArgs = {
-        "./node_modules/jest/bin/jest.js",
+        "../node_modules/jest/bin/jest.js",
         "--runInBand",
         "--",
         "${file}"
