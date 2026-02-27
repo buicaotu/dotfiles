@@ -5,8 +5,9 @@ end
 
 local js_debug_server = vim.fn.expand("~/.local/share/nvim/lazy/vscode-js-debug/out/src/vsDebugServer.js")
 
-for _, adapter_type in ipairs({ "pwa-node", "pwa-chrome" }) do
-  dap.adapters[adapter_type] = {
+for _, adapter_type in ipairs({ "node", "chrome" }) do
+  local pwa_type = "pwa-" .. adapter_type
+  dap.adapters[pwa_type] = {
     type = "server",
     host = "localhost",
     port = "${port}",
@@ -15,6 +16,19 @@ for _, adapter_type in ipairs({ "pwa-node", "pwa-chrome" }) do
       args = { js_debug_server, "${port}" },
     },
   }
+  -- this allow us to handle launch.json configurations
+  -- which specify type as "node" or "chrome" or "msedge"
+  dap.adapters[adapter_type] = function(cb, config)
+    local nativeAdapter = dap.adapters[pwa_type]
+
+    config.type = pwa_type
+
+    if type(nativeAdapter) == "function" then
+      nativeAdapter(cb, config)
+    else
+      cb(nativeAdapter)
+    end
+  end
 end
 
 -- "javascript" 
