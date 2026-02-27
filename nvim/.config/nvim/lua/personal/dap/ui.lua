@@ -19,4 +19,6 @@ end
 local wk = require("which-key")
 wk.add({
   { "<leader>du", require('dapui').toggle, desc = "Toggle DAP UI", mode = "n" },
+  { "<leader>de", require('dapui').eval, desc = "Eval under cursor", mode = { "n", "v" } },
+  { "<leader>dw", function() require('dapui').elements.watches.add(vim.fn.expand("<cexpr>")) end, desc = "Add to watch", mode = "n" },
 })
