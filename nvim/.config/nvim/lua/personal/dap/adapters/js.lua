@@ -35,28 +35,9 @@ end
 for _, language in ipairs({ "typescript" }) do
   dap.configurations[language] = {
     {
-      type = "pwa-node",
-      request = "launch",
-      name = "Debug Jest Tests - " .. language,
-      trace = true, -- include debugger info
-      runtimeExecutable = "node",
-      runtimeArgs = {
-        "../node_modules/jest/bin/jest.js",
-        "--runInBand",
-        "--",
-        "${file}"
-      },
-      rootPath = "${workspaceFolder}",
-      cwd = "${workspaceFolder}",
-      console = "integratedTerminal",
-      internalConsoleOptions = "neverOpen",
-    },
-    {
-      -- type = "pwa-node",
       type = "pwa-chrome",
       request = "attach",
       name = "Attach",
-      -- processId = require 'dap.utils'.pick_process,
       processId = function()
         return require 'dap.utils'.pick_process({
           filter = function (args)
@@ -69,14 +50,6 @@ for _, language in ipairs({ "typescript" }) do
       end,
       cwd = "${workspaceFolder}",
     },
-    -- {
-    --   type = "pwa-chrome",
-    --   request = "launch",
-    --   name = "Start Chrome with \"localhost\"",
-    --   url = "http://localhost:3000",
-    --   webRoot = "${workspaceFolder}",
-    --   userDataDir = "${workspaceFolder}/.vscode/vscode-chrome-debug-userdatadir"
-    -- },
     {
       name = "Launch page proxy mode - " .. language,
       request = "launch",
@@ -114,14 +87,6 @@ for _, language in ipairs({ "typescript" }) do
           "true",
         }
       end,
-      -- runtimeArgs = {
-      --   "test:integration",
-      --   "${input:pagePicker}",
-      --   "${input:browserPicker}",
-      --   "${relativeFile}",
-      --   "--show",
-      --   "true"
-      -- },
       autoAttachChildProcesses = true,
       env = {
         CUCUMBER_TEST_RUNNER = "codeceptjs",
