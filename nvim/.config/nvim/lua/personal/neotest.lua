@@ -9,7 +9,6 @@ neotest.setup({
   },
   adapters = {
     require('neotest-jest')({
-      jestCommand = "node ../node_modules/jest/bin/jest.js",
       cwd = function(path)
         return vim.fn.getcwd()
       end,
@@ -23,14 +22,21 @@ neotest.setup({
         if not default_config or not default_config.runtimeExecutable then
           return default_config
         end
-        local runtime_args = default_config.args or {}
-        table.insert(runtime_args, 2, "--runInBand")
-        table.insert(runtime_args, 2, "--watchAll=false")
+        local bin = default_config.runtimeExecutable
+        local node_modules = bin:match("(.+)/%.bin/jest$")
+        local jest_js = node_modules and (node_modules .. "/jest/bin/jest.js") or bin
+        if not vim.uv.fs_stat(jest_js) then
+          jest_js = vim.uv.fs_realpath(bin) or bin
+        end
+        local runtime_args = { jest_js, "--runInBand", "--watchAll=false" }
+        if default_config.args then
+          vim.list_extend(runtime_args, default_config.args)
+        end
         return {
           name = default_config.name,
           type = default_config.type,
           request = default_config.request,
-          runtimeExecutable = default_config.runtimeExecutable,
+          runtimeExecutable = "node",
           runtimeArgs = runtime_args,
           console = default_config.console,
           internalConsoleOptions = default_config.internalConsoleOptions,
