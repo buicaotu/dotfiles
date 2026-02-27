@@ -30,12 +30,6 @@ return {
   -- Debug
   { "mfussenegger/nvim-dap" },
   { "rcarriga/nvim-dap-ui" },
-  { "mxsdev/nvim-dap-vscode-js" },
-  {
-    "microsoft/vscode-js-debug",
-    build = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out",
-    pin = true
-  },
 
   -- Formatting
   {
