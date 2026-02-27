@@ -1,52 +1,43 @@
-local status_ok, dapjs = pcall(require, "dap-vscode-js")
-if not status_ok then
-	return
-end
-
--- todo: need more setup
-
-dapjs.setup({
-  adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
-  -- node_path = "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
-  -- debugger_path = "(runtimedir)/site/pack/packer/opt/vscode-js-debug", -- Path to vscode-js-debug installation.
-  debugger_path = vim.fn.expand("~/.local/share/nvim/lazy/vscode-js-debug"), -- Path to vscode-js-debug installation.
-  -- debugger_cmd = { "js-debug-adapter" }, -- Command to use to launch the debug server. Takes precedence over `node_path` and `debugger_path`.
-  -- log_file_path = "(stdpath cache)/dap_vscode_js.log", -- Path for file logging
-  -- log_file_level = false, -- Logging level for output to file. Set to false to disable file logging.
-  -- log_console_level = vim.log.levels.ERROR, -- Logging level for output to console. Set to false to disable console output.
-})
-
 local status_ok, dap = pcall(require, "dap")
 if not status_ok then
 	return
 end
 
+for _, adapter_type in ipairs({ "node", "chrome" }) do
+  local pwa_type = "pwa-" .. adapter_type
+  dap.adapters[pwa_type] = {
+    type = "server",
+    host = "localhost",
+    port = "${port}",
+    executable = {
+      command = "node",
+      args = {
+        vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
+        "${port}"
+      },
+    },
+  }
+  -- this allow us to handle launch.json configurations
+  -- which specify type as "node" or "chrome" or "msedge"
+  dap.adapters[adapter_type] = function(cb, config)
+    local nativeAdapter = dap.adapters[pwa_type]
+
+    config.type = pwa_type
+
+    if type(nativeAdapter) == "function" then
+      nativeAdapter(cb, config)
+    else
+      cb(nativeAdapter)
+    end
+  end
+end
 -- "javascript" 
 for _, language in ipairs({ "typescript" }) do
   dap.configurations[language] = {
     {
-      type = "pwa-node",
-      request = "launch",
-      name = "Debug Jest Tests - " .. language,
-      -- trace = true, -- include debugger info
-      runtimeExecutable = "node",
-      runtimeArgs = {
-        "./node_modules/jest/bin/jest.js",
-        "--runInBand",
-        "--",
-        "${file}"
-      },
-      rootPath = "${workspaceFolder}",
-      cwd = "${workspaceFolder}",
-      console = "integratedTerminal",
-      internalConsoleOptions = "neverOpen",
-    },
-    {
-      -- type = "pwa-node",
       type = "pwa-chrome",
       request = "attach",
       name = "Attach",
-      -- processId = require 'dap.utils'.pick_process,
       processId = function()
         return require 'dap.utils'.pick_process({
           filter = function (args)
@@ -59,14 +50,6 @@ for _, language in ipairs({ "typescript" }) do
       end,
       cwd = "${workspaceFolder}",
     },
-    -- {
-    --   type = "pwa-chrome",
-    --   request = "launch",
-    --   name = "Start Chrome with \"localhost\"",
-    --   url = "http://localhost:3000",
-    --   webRoot = "${workspaceFolder}",
-    --   userDataDir = "${workspaceFolder}/.vscode/vscode-chrome-debug-userdatadir"
-    -- },
     {
       name = "Launch page proxy mode - " .. language,
       request = "launch",
@@ -104,14 +87,6 @@ for _, language in ipairs({ "typescript" }) do
           "true",
         }
       end,
-      -- runtimeArgs = {
-      --   "test:integration",
-      --   "${input:pagePicker}",
-      --   "${input:browserPicker}",
-      --   "${relativeFile}",
-      --   "--show",
-      --   "true"
-      -- },
       autoAttachChildProcesses = true,
       env = {
         CUCUMBER_TEST_RUNNER = "codeceptjs",

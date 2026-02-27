@@ -35,5 +35,6 @@ require "personal.lsp"
 require "personal.git"
 require "personal.dap"
 require "personal.buffer"
+require "personal.neotest"
 
 require("personal.dprint").setup()
