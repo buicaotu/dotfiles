@@ -4,6 +4,9 @@ if not status_ok then
 end
 
 neotest.setup({
+  discovery = {
+    enabled = false,
+  },
   adapters = {
     require('neotest-jest')({
       jestCommand = "node ../node_modules/jest/bin/jest.js",
