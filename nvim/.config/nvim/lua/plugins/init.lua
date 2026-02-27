@@ -31,12 +31,7 @@ return {
   { "mfussenegger/nvim-dap" },
   {
     "rcarriga/nvim-dap-ui", 
-    dependencies = { "nvim-neotest/nvim-nio" } 
-  },
-  {
-    "microsoft/vscode-js-debug",
-    build = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out",
-    pin = true
+    dependencies = { "nvim-neotest/nvim-nio" }
   },
 
   -- Formatting
