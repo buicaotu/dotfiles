@@ -26,7 +26,8 @@
   pf = "! git push --force-with-lease #" # push force
   pu = "! git push -u #" # push upstream with default (default is current see push config below)
   l  = "! git log --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' $@ #" # log <commit> <date> <name> <comment>
-  ln  = "! git log -n 10 --first-parent --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' $@ #" # log <commit> <date> <name> <comment>
+  lv  = "! git l -n5 --first-parent $@ #"
+  lx  = "! git l -n10 --first-parent $@ #"
   fl  = "! git fetch origin refs/heads/$1 && git log --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' FETCH_HEAD #" # log <commit> <date> <name> <comment>
   fco = "! git fetch origin refs/heads/$1 && git checkout FETCH_HEAD #" # fetch remote and checkout
   fm = "! git fetch origin refs/heads/$1 && git merge FETCH_HEAD #" # fetch and merge
@@ -52,6 +53,7 @@
   detachedHead = false
 [trace2]
 	eventTarget = af_unix:dgram:/tmp/olly-git-trace2.sock
+	configparams = remote.origin.url
 [rerere]
 	enabled = true
 ; [column]
