@@ -75,9 +75,10 @@ function M.debug_nearest()
     type = "pwa-node",
     request = "launch",
     name = "Debug Nearest Jest Test",
+    trace = true, -- include debugger info
     runtimeExecutable = "node",
     runtimeArgs = {
-      "./node_modules/jest/bin/jest.js",
+      "../node_modules/jest/bin/jest.js",
       "--runInBand",
       "--watchAll=false",
       "--testNamePattern",
