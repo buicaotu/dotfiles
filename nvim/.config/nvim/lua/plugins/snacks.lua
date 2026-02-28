@@ -39,6 +39,7 @@ return {
       },
     },
     bigfile = {},
+    image = {},
     terminal = {
       win = {
         keys = {

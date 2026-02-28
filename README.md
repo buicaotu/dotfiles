@@ -9,6 +9,13 @@ This repository contains my dotfiles, managed with GNU Stow.
 - Git configuration
 - Github configuration
 
+## Dependencies
+
+- [ImageMagick](https://imagemagick.org/) - required for image viewing in Neovim (via snacks.nvim)
+  ```bash
+  brew install imagemagick
+  ```
+
 ## Setup
 
 1. Clone this repository:
