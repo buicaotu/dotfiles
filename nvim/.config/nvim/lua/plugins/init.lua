@@ -78,7 +78,6 @@ return {
   -- Misc
   { 'nvim-lua/plenary.nvim' },
   { 'christoomey/vim-tmux-navigator' },
-  { 'rhysd/conflict-marker.vim' },
   { 'JoosepAlviste/nvim-ts-context-commentstring' },
   { 'lukas-reineke/indent-blankline.nvim' },
   {

@@ -55,9 +55,9 @@ vim.opt.foldtext   = ""
 
 -- Git conflict highlighting
 vim.cmd([[
-  highlight ConflictMarkerBegin ctermbg=34
-  highlight ConflictMarkerOurs ctermbg=22
-  highlight ConflictMarkerTheirs ctermbg=27
-  highlight ConflictMarkerEnd ctermbg=39
-  highlight ConflictMarkerCommonAncestorsHunk ctermbg=yellow
+  highlight ConflictOursMarker ctermbg=34
+  highlight ConflictOurs ctermbg=22
+  highlight ConflictTheirs ctermbg=27
+  highlight ConflictTheirsMarker ctermbg=39
+  highlight ConflictBase ctermbg=yellow
 ]])

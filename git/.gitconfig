@@ -45,6 +45,8 @@
   cmd = code --wait --diff $LOCAL $REMOTE
 [mergetool "vscode"]
   cmd = code --wait $MERGED
+[merge]
+	conflictstyle = diff3
 [diff]
   algorithm = histogram
 [url "git@github.com:"]
