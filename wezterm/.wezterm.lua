@@ -14,11 +14,8 @@ end
 local vim_keys_map = {
   -- CMD+key mappings
   ['CMD'] = {
-    s = utf8.char(0xAA),
+    s = ':w\r',
     c = utf8.char(0xAB),
-    p = utf8.char(0xAC),
-    ['['] = utf8.char(0xAF),
-
   },
   -- ALT+key mappings
   ['ALT'] = {
@@ -57,18 +54,26 @@ local config = wezterm.config_builder()
 config.keys = {
   bind_key_to_vim('CMD', 's'),
   bind_key_to_vim('CMD', 'c'),
-  bind_key_to_vim('CMD', 'p'),
-  bind_key_to_vim('CMD', '['),
   bind_key_to_vim('ALT', 'LeftArrow'),
   bind_key_to_vim('ALT', 'RightArrow'),
   {
-    key = 'r',
+    key = 'n',
     mods = 'CMD|SHIFT',
-    action = wezterm.action.ReloadConfiguration,
+    action = wezterm.action.ActivatePaneDirection('Next'),
+  },
+  {
+    key = '\\',
+    mods = 'CTRL',
+    action = wezterm.action.SplitPane({ direction = 'Right' }),
+  },
+  {
+    key = '|',
+    mods = 'CTRL|SHIFT',
+    action = wezterm.action.SplitPane({ direction = 'Down' }),
   },
 }
 config.window_background_opacity = 0.85
-config.font_size = 14.0
+config.font_size = 16.0
 config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 config.cursor_blink_rate = 500
 

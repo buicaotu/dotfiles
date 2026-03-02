@@ -69,9 +69,7 @@ wk.add({
   },
 
   -- Special characters from wezterm
-  { "<Char-0xAA>", "<cmd>write<cr>",      desc = "Save file",            mode = "n" },
   { "<Char-0xAB>", 'y<cmd>let @+=@0<CR>', desc = "Copy to clipboard",    mode = "v" },
-  { "<Char-0xAD>", ':norm "+p',           desc = "Paste from clipboard", mode = { "n", "i" } },
 
   -- Option+Arrow key mappings
   { "<Char-0xB0>", "b",                   desc = "Move word backward",   mode = "n" },
