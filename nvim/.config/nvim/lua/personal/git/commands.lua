@@ -3,21 +3,6 @@ local M = {}
 local diff = require('personal.git.diff')
 local progress = require('personal.progress')
 
-local function register_reload_command()
-  vim.api.nvim_create_user_command('SS', function()
-    vim.cmd(':w')
-    local file_path = vim.fn.expand('%')
-    vim.cmd('source ' .. file_path)
-    print('source file ' .. file_path)
-  end, {})
-end
-
-local function register_inspect_helper()
-  _G.P = function(obj)
-    print(vim.inspect(obj))
-  end
-end
-
 local function register_diff_commands()
   vim.api.nvim_create_user_command('DiffCommit', function(opts)
     local commit = opts.args
@@ -38,10 +23,50 @@ local function register_diff_commands()
   end, { nargs = '?' })
 end
 
+local function register_stage_changes_command()
+  -- save the index fugitive buffer i.e. staging the changes
+  -- this is the same as opening a diff, using diffput then save the fugitive buffer
+  -- but this command will confirm and save all fugitive buffer (! to skip confirmation)
+  vim.api.nvim_create_user_command("StageChanges", function(opts)
+    -- collect modified fugitive index buffers first
+    local to_stage = {}
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      local name = vim.api.nvim_buf_get_name(buf)
+      if name:match("fugitive://.*//0/") and vim.bo[buf].modified then
+        table.insert(to_stage, { buf = buf, file = name:match("fugitive://.*//0/(.*)") })
+      end
+    end
+
+    if #to_stage == 0 then
+      print("Nothing to stage")
+      return
+    end
+
+    -- skip confirmation if bang
+    if not opts.bang then
+      local files = vim.tbl_map(function(item) return "  - " .. item.file end, to_stage)
+      local prompt = "Stage these files?\n" .. table.concat(files, "\n") .. "\n[y/n]: "
+      local answer = vim.fn.input(prompt)
+      if answer:lower() ~= "y" then
+        print("\nAborted")
+        return
+      end
+    end
+
+    -- write all
+    local staged = {}
+    for _, item in ipairs(to_stage) do
+      vim.api.nvim_buf_call(item.buf, function() vim.cmd("write") end)
+      table.insert(staged, item.file)
+    end
+
+    print((opts.bang and "" or "\n") .. "Staged: " .. table.concat(staged, ", "))
+  end, { bang = true, desc = "Stage all fugitive index buffers" })
+end
+
 function M.setup()
-  register_reload_command()
-  register_inspect_helper()
   register_diff_commands()
+  register_stage_changes_command()
 end
 
 return M
