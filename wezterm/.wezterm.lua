@@ -71,10 +71,36 @@ config.keys = {
     mods = 'CTRL|SHIFT',
     action = wezterm.action.SplitPane({ direction = 'Down' }),
   },
+  {
+    key = 'LeftArrow',
+    mods = 'CMD',
+    action = wezterm.action.AdjustPaneSize({ 'Left', 5 }),
+  },
+  {
+    key = 'RightArrow',
+    mods = 'CMD',
+    action = wezterm.action.AdjustPaneSize({ 'Right', 5 }),
+  },
+  {
+    key = 'UpArrow',
+    mods = 'CMD',
+    action = wezterm.action.AdjustPaneSize({ 'Up', 5 }),
+  },
+  {
+    key = 'DownArrow',
+    mods = 'CMD',
+    action = wezterm.action.AdjustPaneSize({ 'Down', 5 }),
+  },
+  {
+    key = 'm',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.TogglePaneZoomState,
+  },
 }
 config.window_background_opacity = 0.85
-config.font_size = 16.0
+config.font_size = 20.0
 config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+config.default_cursor_style = 'BlinkingBar'
 config.cursor_blink_rate = 500
 
 return config
