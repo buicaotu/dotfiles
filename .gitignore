@@ -49,3 +49,6 @@ session.vim
 
 # Stow temp files
 .stow-local-ignore
+
+# AI
+.claude

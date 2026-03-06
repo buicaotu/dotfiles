@@ -52,15 +52,13 @@ local config = wezterm.config_builder()
 
 -- This is where you actually apply your config choices
 config.keys = {
+  -- Vim passthrough
   bind_key_to_vim('CMD', 's'),
   bind_key_to_vim('CMD', 'c'),
   bind_key_to_vim('ALT', 'LeftArrow'),
   bind_key_to_vim('ALT', 'RightArrow'),
-  {
-    key = 'n',
-    mods = 'CMD|SHIFT',
-    action = wezterm.action.ActivatePaneDirection('Next'),
-  },
+
+  -- Pane splits
   {
     key = '\\',
     mods = 'CTRL',
@@ -71,6 +69,35 @@ config.keys = {
     mods = 'CTRL|SHIFT',
     action = wezterm.action.SplitPane({ direction = 'Down' }),
   },
+
+  -- Pane navigation
+  {
+    key = 'n',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.ActivatePaneDirection('Next'),
+  },
+  {
+    key = 'h',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.ActivatePaneDirection('Left'),
+  },
+  {
+    key = 'l',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.ActivatePaneDirection('Right'),
+  },
+  {
+    key = 'k',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.ActivatePaneDirection('Up'),
+  },
+  {
+    key = 'j',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.ActivatePaneDirection('Down'),
+  },
+
+  -- Pane resize
   {
     key = 'LeftArrow',
     mods = 'CMD',
@@ -96,8 +123,31 @@ config.keys = {
     mods = 'CMD|SHIFT',
     action = wezterm.action.TogglePaneZoomState,
   },
+
+  -- Scrolling
+  {
+    key = 'u',
+    mods = 'CMD',
+    action = wezterm.action.ScrollByLine(-3),
+  },
+  {
+    key = 'd',
+    mods = 'CMD',
+    action = wezterm.action.ScrollByLine(3),
+  },
+
+  -- Quick select
+  {
+    key = 'f',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.QuickSelect,
+  },
 }
 config.window_background_opacity = 0.85
+config.inactive_pane_hsb = {
+  saturation = 0.8,
+  brightness = 0.6,
+}
 config.font_size = 20.0
 config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 config.default_cursor_style = 'BlinkingBar'
