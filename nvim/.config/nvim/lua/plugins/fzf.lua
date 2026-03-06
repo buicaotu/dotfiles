@@ -168,7 +168,7 @@ return {
         mode = "n"
       },
       {
-        "<leader>lf",
+        "<leader>S",
         function()
           vim.cmd.FzfLua('quickfix')
         end,
