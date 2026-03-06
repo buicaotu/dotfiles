@@ -74,7 +74,23 @@ config.keys = {
   {
     key = 'n',
     mods = 'CMD|SHIFT',
-    action = wezterm.action.ActivatePaneDirection('Next'),
+    action = wezterm.action_callback(function(win, pane)
+      local tab = pane:tab()
+      local is_zoomed = false
+      for _, p in ipairs(tab:panes_with_info()) do
+        if p.is_zoomed then
+          is_zoomed = true
+          break
+        end
+      end
+      if is_zoomed then
+        win:perform_action(wezterm.action.TogglePaneZoomState, pane)
+        win:perform_action(wezterm.action.ActivatePaneDirection('Next'), pane)
+        win:perform_action(wezterm.action.TogglePaneZoomState, win:active_tab():active_pane())
+      else
+        win:perform_action(wezterm.action.ActivatePaneDirection('Next'), pane)
+      end
+    end),
   },
   {
     key = 'h',
