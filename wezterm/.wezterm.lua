@@ -84,7 +84,6 @@ config.keys = {
         end
       end
       if is_zoomed then
-        win:perform_action(wezterm.action.TogglePaneZoomState, pane)
         win:perform_action(wezterm.action.ActivatePaneDirection('Next'), pane)
         win:perform_action(wezterm.action.TogglePaneZoomState, win:active_tab():active_pane())
       else
