@@ -2,7 +2,7 @@ return {
   "stevearc/oil.nvim",
   opts = {
     keymaps = {
-      ['<leader>y'] = 'actions.copy_entry_path',
+      ['<leader>yy'] = 'actions.copy_entry_path',
       ['<leader>c'] = 'actions.cd',
       ['<leader>v'] = 'actions.select_vsplit',
       ['<leader>i'] = 'actions.preview',

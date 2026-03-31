@@ -1,6 +1,8 @@
 [user]
   name = Tu Bui
   email = buicaotu@gmail.com
+[include]
+  path = ~/.config/git/local.gitconfig
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
@@ -49,8 +51,6 @@
 	conflictstyle = diff3
 [diff]
   algorithm = histogram
-[url "git@github.com:"]
-	insteadOf = https://github.com/
 [advice]
   detachedHead = false
 [trace2]

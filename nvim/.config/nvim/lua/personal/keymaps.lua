@@ -11,9 +11,68 @@ wk.add({
   -- Clipboard
   {
     "<leader>y",
+    group = "Yank",
+  },
+  {
+    "<leader>yc",
     '"+y',
     desc = "Yank to clipboard",
     mode = { "n", "v" }
+  },
+  {
+    "<leader>yl",
+    function()
+      local buffer_path = vim.api.nvim_buf_get_name(0)
+      if buffer_path == "" then
+        vim.notify("Current buffer has no path", vim.log.levels.WARN)
+        return
+      end
+      local working_dir = vim.fn.getcwd()
+      local path
+      if vim.startswith(buffer_path, working_dir) then
+        path = buffer_path:sub(working_dir:len() + 2)
+      else
+        path = buffer_path
+      end
+      vim.fn.setreg('+', path)
+      vim.fn.setreg('"', path)
+      vim.notify("Copied: " .. path, vim.log.levels.INFO)
+    end,
+    desc = "Copy file path",
+    mode = "n",
+  },
+  {
+    "<leader>yl",
+    function()
+      local buffer_path = vim.api.nvim_buf_get_name(0)
+      if buffer_path == "" then
+        vim.notify("Current buffer has no path", vim.log.levels.WARN)
+        return
+      end
+      local working_dir = vim.fn.getcwd()
+      local path
+      if vim.startswith(buffer_path, working_dir) then
+        path = buffer_path:sub(working_dir:len() + 2)
+      else
+        path = buffer_path
+      end
+      local start_line = vim.fn.line("v")
+      local end_line = vim.fn.line(".")
+      if start_line > end_line then
+        start_line, end_line = end_line, start_line
+      end
+      local result
+      if start_line == end_line then
+        result = path .. ":" .. start_line
+      else
+        result = path .. ":" .. start_line .. "-" .. end_line
+      end
+      vim.fn.setreg('+', result)
+      vim.fn.setreg('"', result)
+      vim.notify("Copied: " .. result, vim.log.levels.INFO)
+    end,
+    desc = "Copy file path with lines",
+    mode = "v",
   },
   -- Window navigation
   {
