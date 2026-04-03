@@ -3,11 +3,29 @@ local wezterm = require('wezterm')
 local function is_vim(pane)
   local is_vim_env = pane:get_user_vars().IS_NVIM == 'true'
   if is_vim_env == true then return true end
-  -- This gsub is equivalent to POSIX basename(3)
-  -- Given "/foo/bar" returns "bar"
-  -- Given "c:\\foo\\bar" returns "bar"
+
   local process_name = string.gsub(pane:get_foreground_process_name(), '(.*[/\\])(.*)', '%2')
-  return process_name == 'nvim' or process_name == 'vim'
+  if process_name == 'nvim' or process_name == 'vim' then
+    return true
+  end
+
+  -- Check if vim is the active command inside tmux
+  if process_name == 'tmux' then
+    local success, stdout = wezterm.run_child_process({
+      'tmux', 'display-message', '-p', '#{pane_current_command}'
+    })
+    if success then
+      local cmd = stdout:gsub('%s+', '')
+      return cmd == 'nvim' or cmd == 'vim'
+    end
+  end
+
+  return false
+end
+
+local function is_tmux(pane)
+  local process_name = string.gsub(pane:get_foreground_process_name(), '(.*[/\\])(.*)', '%2')
+  return process_name == 'tmux'
 end
 
 --- Keys that we want to send to neovim based on modifier combinations
@@ -58,16 +76,28 @@ config.keys = {
   bind_key_to_vim('ALT', 'LeftArrow'),
   bind_key_to_vim('ALT', 'RightArrow'),
 
-  -- Pane splits
+  -- Pane splits (pass through to tmux if inside tmux)
   {
     key = '\\',
     mods = 'CTRL',
-    action = wezterm.action.SplitPane({ direction = 'Right' }),
+    action = wezterm.action_callback(function(win, pane)
+      if is_tmux(pane) then
+        win:perform_action(wezterm.action.SendKey({ key = '\\', mods = 'CTRL' }), pane)
+      else
+        win:perform_action(wezterm.action.SplitPane({ direction = 'Right' }), pane)
+      end
+    end),
   },
   {
     key = '|',
     mods = 'CTRL|SHIFT',
-    action = wezterm.action.SplitPane({ direction = 'Down' }),
+    action = wezterm.action_callback(function(win, pane)
+      if is_tmux(pane) then
+        win:perform_action(wezterm.action.SendKey({ key = '|', mods = 'CTRL|SHIFT' }), pane)
+      else
+        win:perform_action(wezterm.action.SplitPane({ direction = 'Down' }), pane)
+      end
+    end),
   },
 
   -- Pane navigation
