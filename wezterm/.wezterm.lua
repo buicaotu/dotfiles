@@ -76,28 +76,16 @@ config.keys = {
   bind_key_to_vim('ALT', 'LeftArrow'),
   bind_key_to_vim('ALT', 'RightArrow'),
 
-  -- Pane splits (pass through to tmux if inside tmux)
+  -- Pane splits
   {
     key = '\\',
     mods = 'CTRL',
-    action = wezterm.action_callback(function(win, pane)
-      if is_tmux(pane) then
-        win:perform_action(wezterm.action.SendKey({ key = '\\', mods = 'CTRL' }), pane)
-      else
-        win:perform_action(wezterm.action.SplitPane({ direction = 'Right' }), pane)
-      end
-    end),
+    action = wezterm.action.SplitPane({ direction = 'Right' }),
   },
   {
     key = '|',
     mods = 'CTRL|SHIFT',
-    action = wezterm.action_callback(function(win, pane)
-      if is_tmux(pane) then
-        win:perform_action(wezterm.action.SendKey({ key = '|', mods = 'CTRL|SHIFT' }), pane)
-      else
-        win:perform_action(wezterm.action.SplitPane({ direction = 'Down' }), pane)
-      end
-    end),
+    action = wezterm.action.SplitPane({ direction = 'Down' }),
   },
 
   -- Pane navigation
