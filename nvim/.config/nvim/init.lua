@@ -30,7 +30,6 @@ require("lazy").setup("plugins")
 require "personal.keymaps"
 require "personal.options"
 require "personal.treesitter"
-require "personal.comment"
 require "personal.lsp"
 require "personal.git"
 require "personal.dap"

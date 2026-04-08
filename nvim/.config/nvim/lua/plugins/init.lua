@@ -82,7 +82,6 @@ return {
   -- Misc
   { 'nvim-lua/plenary.nvim' },
   { 'christoomey/vim-tmux-navigator' },
-  { 'JoosepAlviste/nvim-ts-context-commentstring', opts = { enable_autocmd = false } },
   { 'lukas-reineke/indent-blankline.nvim' },
   {
     'chrishrb/gx.nvim',
