@@ -106,6 +106,26 @@ end
 local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 local wk = require("which-key")
 
+-- Repeatable treesitter node selection (overrides 0.12 defaults with ; / , support)
+local node_select = ts_repeat_move.make_repeatable_move(function(opts)
+  if opts.forward then
+    require('vim.treesitter._select').select_parent(vim.v.count1)
+  else
+    require('vim.treesitter._select').select_child(vim.v.count1)
+  end
+end)
+local node_sibling = ts_repeat_move.make_repeatable_move(function(opts)
+  if opts.forward then
+    require('vim.treesitter._select').select_next(vim.v.count1)
+  else
+    require('vim.treesitter._select').select_prev(vim.v.count1)
+  end
+end)
+vim.keymap.set({ 'x', 'o' }, 'an', function() node_select({ forward = true }) end,  { desc = 'Select parent (outer) node' })
+vim.keymap.set({ 'x', 'o' }, 'in', function() node_select({ forward = false }) end, { desc = 'Select child (inner) node' })
+vim.keymap.set({ 'x' },      ']n', function() node_sibling({ forward = true }) end, { desc = 'Select next sibling node' })
+vim.keymap.set({ 'x' },      '[n', function() node_sibling({ forward = false }) end, { desc = 'Select prev sibling node' })
+
 -- Helpers to wrap simple commands in the new repeatable move signature
 local bmove = ts_repeat_move.make_repeatable_move(function(opts)
   if opts.forward then
