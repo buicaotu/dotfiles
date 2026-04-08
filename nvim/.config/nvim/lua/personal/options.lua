@@ -42,8 +42,9 @@ vim.opt.updatetime = 500 -- Default 4000, time for plugin to update
 
 -- Fold settings
 vim.opt.foldmethod = 'expr'
-vim.opt.foldlevel  = 99
+vim.opt.foldlevelstart = 99
 vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldcolumn = "auto"
 vim.opt.foldtext   = ""
 vim.opt.fillchars  = {
   fold = ' ',
