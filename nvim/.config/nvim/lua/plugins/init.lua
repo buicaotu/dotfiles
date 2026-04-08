@@ -47,7 +47,6 @@ return {
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       "nvim-neotest/neotest-jest",
     }
@@ -78,7 +77,7 @@ return {
   -- Misc
   { 'nvim-lua/plenary.nvim' },
   { 'christoomey/vim-tmux-navigator' },
-  { 'JoosepAlviste/nvim-ts-context-commentstring' },
+  { 'JoosepAlviste/nvim-ts-context-commentstring', opts = { enable_autocmd = false } },
   { 'lukas-reineke/indent-blankline.nvim' },
   {
     'chrishrb/gx.nvim',

@@ -45,13 +45,13 @@ vim.opt.foldmethod = 'expr'
 vim.opt.foldlevel  = 99
 vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldtext   = ""
--- vim.opt.fillchars  = {
---   fold = ' ',
---   foldclose = '', -- ''
---   foldopen = '', -- ''
---   foldsep = ' ',
---   foldinner = ' '
--- }
+vim.opt.fillchars  = {
+  fold = ' ',
+  foldclose = '', -- ''
+  foldopen = '', -- ''
+  foldsep = ' ',
+  foldinner = ' '
+}
 
 -- Git conflict highlighting
 vim.cmd([[

@@ -127,7 +127,7 @@ if not mr.is_installed('js-debug-adapter') then
 end
 
 require("mason-lspconfig").setup({
-  ensure_installed = { "ts_ls", "tsgo", "eslint", "efm" },
+  ensure_installed = { "ts_ls", "tsgo", "eslint", "efm", "cssls" },
   automatic_enable = false,
   automatic_installation = true,
 })
@@ -327,7 +327,11 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls' })
+vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls' })
+
+-- CSS color preview via built-in LSP document_color (Neovim 0.12+)
+-- cssls provides textDocument/documentColor; render as virtual text swatches
+vim.lsp.document_color.enable(true, nil, { style = 'virtual' })
 
 -- Diagnostic navigation with repeat support
 local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")

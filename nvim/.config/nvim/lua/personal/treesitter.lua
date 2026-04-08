@@ -1,30 +1,30 @@
-local status_ok, configs = pcall(require, "nvim-treesitter.configs")
-if not status_ok then
-  return
-end
+-- nvim-treesitter main branch (full rewrite, requires Neovim 0.12+)
+-- setup() only accepts install_dir; all module config moved to ftplugin/autocmds.
+-- Run :TSInstall <lang> or :TSUpdate to manage parsers. No auto_install in new API.
+require('nvim-treesitter').setup {}
 
-configs.setup({
-  ensure_installed = { "bash", "c", "javascript", "json", "lua", "python", "typescript", "tsx", "css", "rust", "java", "yaml", "markdown", "markdown_inline", "kotlin" },
-  sync_install = false,
-  auto_install = true,
-  ignore_install = { "phpdoc" },
-  highlight = {
-    enable = true,
-    disable = { "vim" },
+-- Treesitter indent (experimental) - enable for most filetypes except python/css
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = {
+    'bash', 'c', 'javascript', 'javascriptreact', 'json', 'lua',
+    'typescript', 'typescriptreact', 'rust', 'java', 'yaml',
+    'markdown', 'kotlin',
   },
-  autopairs = {
-    enable = true,
-  },
-  indent = { enable = true, disable = { "python", "css" } },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      node_incremental = "=",
-      node_decremental = "-",
-    },
-  },
-  modules = {},
+  callback = function()
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
 })
+
+-- Enable treesitter highlighting (and parser attachment) for all filetypes.
+-- Required in the new main branch — no longer automatic.
+-- Silently no-ops for filetypes without an installed parser.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = '*',
+  callback = function() pcall(vim.treesitter.start) end,
+})
+
+-- NOTE: incremental_selection (= / - keymaps) was removed in the nvim-treesitter
+-- main branch rewrite. Those keymaps no longer function.
 
 -- nvim-treesitter-textobjects (main branch API)
 local ts_ok, ts_textobjects = pcall(require, "nvim-treesitter-textobjects")
