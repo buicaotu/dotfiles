@@ -23,9 +23,6 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function() pcall(vim.treesitter.start) end,
 })
 
--- NOTE: incremental_selection (= / - keymaps) was removed in the nvim-treesitter
--- main branch rewrite. Those keymaps no longer function.
-
 -- nvim-treesitter-textobjects (main branch API)
 local ts_ok, ts_textobjects = pcall(require, "nvim-treesitter-textobjects")
 if not ts_ok then

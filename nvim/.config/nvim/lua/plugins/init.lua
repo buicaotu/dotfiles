@@ -11,7 +11,12 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    build = ':TSUpdate'
+    build = ':TSUpdate',
+    init = function()
+      -- Queries moved to runtime/queries/ in the main branch rewrite,
+      -- but lazy.nvim only adds plugin.dir (not plugin.dir/runtime) to rtp.
+      vim.opt.rtp:append(vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime")
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
