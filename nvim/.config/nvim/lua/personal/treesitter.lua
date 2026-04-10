@@ -75,7 +75,6 @@ end
 local move_maps = {
   { "goto_next_start",     "]f", "@function.outer" },
   { "goto_next_start",     "]b", "@brackets.outer" },
-  { "goto_next_start",     "]z", "@fold",           "folds" },
   { "goto_next_start",     "]'", "@quote.outer" },
   { "goto_next_start",     "]x", "@comment.outer" },
   { "goto_next_start",     "]a", "@jsxa" },
