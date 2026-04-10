@@ -6,6 +6,11 @@ return {
     },
     cli = {
       picker = 'fzf-lua',
+      tools = {
+        claude = {
+          cmd = vim.g.claude_cmd or { "claude" },
+        },
+      },
     },
   },
   keys = {
@@ -70,6 +75,11 @@ return {
       function() require("sidekick.nes").update() end,
       mode = { "n" },
       desc = "Sidekick NES Update Suggestions",
+    },
+    {
+      "<leader>acc",
+      function() require("sidekick.cli").toggle({ name = "claude", continue = true, focus = true }) end,
+      desc = "Sidekick Continue Claude",
     },
     {
       "<leader>acl",

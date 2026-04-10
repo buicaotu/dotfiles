@@ -21,7 +21,8 @@ return {
       options = {
         theme = 'auto',
         section_separators = '',
-        component_separators = ''
+        component_separators = '',
+        globalstatus = true,
       },
       sections = {
         lualine_a = {'mode'},

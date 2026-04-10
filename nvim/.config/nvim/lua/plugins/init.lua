@@ -11,7 +11,12 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    build = ':TSUpdate'
+    build = ':TSUpdate',
+    init = function()
+      -- Queries moved to runtime/queries/ in the main branch rewrite,
+      -- but lazy.nvim only adds plugin.dir (not plugin.dir/runtime) to rtp.
+      vim.opt.rtp:append(vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime")
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
@@ -47,7 +52,6 @@ return {
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       "nvim-neotest/neotest-jest",
     }
@@ -78,7 +82,6 @@ return {
   -- Misc
   { 'nvim-lua/plenary.nvim' },
   { 'christoomey/vim-tmux-navigator' },
-  { 'JoosepAlviste/nvim-ts-context-commentstring' },
   { 'lukas-reineke/indent-blankline.nvim' },
   {
     'chrishrb/gx.nvim',
