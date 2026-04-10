@@ -125,6 +125,10 @@ if not mr.is_installed('js-debug-adapter') then
   local pkg = mr.get_package('js-debug-adapter')
   pkg:install({ version = 'v1.110.0' })
 end
+if not mr.is_installed('tree-sitter-cli') then
+  local pkg = mr.get_package('tree-sitter-cli')
+  pkg:install()
+end
 
 require("mason-lspconfig").setup({
   ensure_installed = { "ts_ls", "tsgo", "eslint", "efm", "cssls" },
