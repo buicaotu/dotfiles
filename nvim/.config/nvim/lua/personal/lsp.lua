@@ -150,7 +150,7 @@ vim.lsp.config('eslint', vim.tbl_extend("force", eslint_base_cfg, {
 
 vim.lsp.config('jdtls', {
   cmd = {
-    "/opt/homebrew/opt/openjdk@21/bin/java",
+    vim.g.java_bin or "java",
     "-Dlog.level=WARN",
     "--add-opens=java.base/java.lang=ALL-UNNAMED",
     "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
@@ -159,7 +159,7 @@ vim.lsp.config('jdtls', {
     "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
     "-jar", vim.fn.glob(vim.fn.stdpath("data") ..
     "/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar"),
-    "-configuration", vim.fn.stdpath("data") .. "/mason/packages/jdtls/config_mac",
+    "-configuration", vim.fn.stdpath("data") .. "/mason/packages/jdtls/" .. (vim.g.jdtls_config or "config_mac"),
     "-data", vim.fn.stdpath("cache") .. "/jdtls/workspace"
   },
   settings = {
@@ -327,7 +327,7 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls' })
+vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot' })
 
 -- CSS color preview via built-in LSP document_color (Neovim 0.12+)
 -- cssls provides textDocument/documentColor; render as virtual text swatches
