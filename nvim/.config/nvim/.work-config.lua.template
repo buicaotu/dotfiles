@@ -1,0 +1,8 @@
+-- Machine-specific overrides. Copy to .work-config.lua and adjust values.
+-- All keys are optional; defaults are shown in comments.
+return {
+  -- enable_dprint = false,
+  -- claude_cmd = { "claude" },
+  -- java_bin = "java",
+  -- jdtls_config = "config_mac",  -- "config_linux" or "config_mac"
+}
