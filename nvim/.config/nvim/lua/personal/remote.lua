@@ -32,6 +32,20 @@ function M.setup()
     end
     return original_open(path, opt)
   end
+
+  -- Remap :q and :qa to detach instead of quit in remote sessions.
+  vim.cmd([[
+    function! s:solely_in_cmd(command)
+      return (getcmdtype() == ':' && getcmdline() ==# a:command)
+    endfunction
+    cnoreabbrev <expr> q <SID>solely_in_cmd('q') ? 'detach' : 'q'
+    cnoreabbrev <expr> qa <SID>solely_in_cmd('qa') ? 'detach' : 'qa'
+  ]])
+
+  -- Override :Qa (typo-friendly command from keymaps) to also detach.
+  vim.api.nvim_create_user_command('Qa', function()
+    vim.cmd('detach')
+  end, { force = true })
 end
 
 return M
