@@ -37,3 +37,4 @@ require "personal.buffer"
 require "personal.neotest"
 
 require("personal.dprint").setup()
+require("personal.remote").setup()

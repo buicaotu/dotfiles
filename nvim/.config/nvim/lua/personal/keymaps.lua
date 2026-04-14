@@ -168,6 +168,11 @@ wk.add({
 vim.g.copilot_no_tab_map = true
 
 -- Common commands misspelled
+vim.api.nvim_create_user_command('Browse', function(opts)
+  local url = opts.fargs[1]
+  if url and url ~= "" then vim.ui.open(url) end
+end, { nargs = "?" })
+
 vim.api.nvim_create_user_command('W', function(opts)
   vim.cmd('w' .. (opts.args ~= '' and ' ' .. opts.args or ''))
 end, { nargs = '*' })
