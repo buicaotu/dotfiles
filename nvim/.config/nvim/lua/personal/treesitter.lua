@@ -150,6 +150,14 @@ local cqstack = ts_repeat_move.make_repeatable_move(function(opts)
   end
 end)
 
+local foldmove = ts_repeat_move.make_repeatable_move(function(opts)
+  if opts.forward then
+    vim.cmd("normal! zj")
+  else
+    vim.cmd("normal! zk")
+  end
+end)
+
 wk.add({
   -- Repeat movement with ; and ,
   { ";",  ts_repeat_move.repeat_last_move,          desc = "Repeat last move",            mode = { "n", "x", "o" } },
@@ -172,6 +180,10 @@ wk.add({
   { "[q", function() cqmove({ forward = false }) end, desc = "Previous quickfix item",      mode = { "n", "x", "o" } },
   { "]Q", function() cqstack({ forward = true }) end, desc = "Newer quickfix list",         mode = { "n", "x", "o" } },
   { "[Q", function() cqstack({ forward = false }) end, desc = "Older quickfix list",         mode = { "n", "x", "o" } },
+
+  -- Fold navigation
+  { "zj", function() foldmove({ forward = true }) end, desc = "Next fold",                   mode = { "n", "x", "o" } },
+  { "zk", function() foldmove({ forward = false }) end, desc = "Previous fold",               mode = { "n", "x", "o" } },
 })
 
 local context_ok, context = pcall(require, "treesitter-context")
