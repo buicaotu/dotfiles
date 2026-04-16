@@ -17,6 +17,27 @@ local function is_headless()
   return false
 end
 
+local function setup_osc52_clipboard()
+  local function paste()
+    return {
+      vim.fn.split(vim.fn.getreg(""), "\n"),
+      vim.fn.getregtype(""),
+    }
+  end
+
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = paste,
+      ["*"] = paste,
+    },
+  }
+end
+
 local function override_ui_open()
   local original_open = vim.ui.open
   vim.ui.open = function(path, opt)
@@ -48,11 +69,9 @@ function M.setup()
     setup_detach_remaps()
   end
 
-  if is_remote_server() then
-    vim.notify('Remote UI', vim.log.levels.INFO)
-    override_ui_open()
-  elseif is_ssh() then
-    vim.notify('Remote (SSH)', vim.log.levels.INFO)
+  if is_remote_server() or is_ssh() then
+    vim.notify('Remote environment detected', vim.log.levels.INFO)
+    setup_osc52_clipboard()
     override_ui_open()
   end
 end
