@@ -320,6 +320,18 @@ vim.lsp.config('efm', {
   timeout_ms = 10000,
 })
 
+vim.lsp.config('pyright', {
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "openFilesOnly",
+      },
+    },
+  },
+})
+
 vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
@@ -331,7 +343,7 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot' })
+vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot', 'pyright' })
 
 -- CSS color preview via built-in LSP document_color (Neovim 0.12+)
 -- cssls provides textDocument/documentColor; render as virtual text swatches
