@@ -11,7 +11,7 @@ end
 
 local function close_all_fugitive_diff_windows()
   local alt = vim.fn.bufnr('#')
-  local alt_is_fugitive = alt ~= -1 and is_fugitive_buf(alt)
+  local alt_is_fugitive_or_empty = alt == -1 or is_fugitive_buf(alt)
 
   local wins = vim.api.nvim_tabpage_list_wins(0)
   local fugitive_bufs = {}
@@ -25,8 +25,7 @@ local function close_all_fugitive_diff_windows()
     pcall(vim.api.nvim_buf_delete, buf, { force = true })
   end
 
-  -- if alt was fugitive, replace it with alt2
-  if alt_is_fugitive then
+  if alt_is_fugitive_or_empty then
     local alt2 = vim.w._alt2
     if alt2 and alt2 ~= -1 and vim.api.nvim_buf_is_valid(alt2) then
       vim.fn.setreg('#', alt2)
@@ -130,11 +129,15 @@ function M.setup()
   vim.api.nvim_create_autocmd('BufEnter', {
     callback = function()
       local cur = vim.fn.bufnr('%')
-      local old_alt = vim.w._alt
-      if old_alt and cur ~= old_alt then
+      local cur_alt = vim.fn.bufnr('#')
+      local old_alt = vim.w._prev_alt
+      -- we only set the _alt2 if 
+      --  - cur and alt are not swapped
+      --  - alt has changed
+      if old_alt and cur ~= old_alt and cur_alt ~= old_alt then
         vim.w._alt2 = old_alt
       end
-      vim.w._alt = vim.fn.bufnr('#')
+      vim.w._prev_alt = cur_alt
     end,
   })
 end
