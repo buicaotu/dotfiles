@@ -29,6 +29,7 @@ local function close_all_fugitive_diff_windows()
     local alt2 = vim.w._alt2
     if alt2 and alt2 ~= -1 and vim.api.nvim_buf_is_valid(alt2) then
       vim.fn.setreg('#', alt2)
+      vim.w._prev_alt = alt2
     end
   end
 end
