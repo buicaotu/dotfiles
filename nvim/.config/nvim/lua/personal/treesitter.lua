@@ -2,6 +2,7 @@
 -- setup() only accepts install_dir; all module config moved to ftplugin/autocmds.
 -- Run :TSInstall <lang> or :TSUpdate to manage parsers. No auto_install in new API.
 require('nvim-treesitter').setup {}
+require('nvim-treesitter').install({ 'typescript', 'tsx', 'json', 'java' })
 
 -- Treesitter indent (experimental) - enable for most filetypes except python/css
 vim.api.nvim_create_autocmd('FileType', {
@@ -59,8 +60,8 @@ local select_maps = {
   { "al", "@loop.outer" },
   { "il", "@loop.inner" },
   { "ax", "@comment.outer" },
-  { "i'", "@quote.inner" },
-  { "a'", "@quote.outer" },
+  { "iq", "@quote.inner" },
+  { "aq", "@quote.outer" },
   { "aa", "@jsxa" },
   { "``", "@code_block" },
 }

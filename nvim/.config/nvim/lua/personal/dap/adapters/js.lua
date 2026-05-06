@@ -3,6 +3,11 @@ if not status_ok then
 	return
 end
 
+local debug_server = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js"
+if vim.fn.filereadable(debug_server) == 0 then
+  return
+end
+
 for _, adapter_type in ipairs({ "node", "chrome" }) do
   local pwa_type = "pwa-" .. adapter_type
   dap.adapters[pwa_type] = {
@@ -11,10 +16,7 @@ for _, adapter_type in ipairs({ "node", "chrome" }) do
     port = "${port}",
     executable = {
       command = "node",
-      args = {
-        vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
-        "${port}"
-      },
+      args = { debug_server, "${port}" },
     },
   }
   -- this allow us to handle launch.json configurations

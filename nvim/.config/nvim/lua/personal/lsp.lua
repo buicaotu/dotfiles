@@ -125,7 +125,9 @@ if not mr.is_installed('js-debug-adapter') then
   local pkg = mr.get_package('js-debug-adapter')
   pkg:install({ version = 'v1.110.0' })
 end
-if not mr.is_installed('tree-sitter-cli') then
+-- Skip Mason if `tree-sitter` is already on PATH (e.g. `cargo install
+-- tree-sitter-cli` on hosts whose glibc is too old for Mason's prebuilt npm binary).
+if vim.fn.executable('tree-sitter') == 0 and not mr.is_installed('tree-sitter-cli') then
   local pkg = mr.get_package('tree-sitter-cli')
   pkg:install()
 end
