@@ -62,3 +62,6 @@ vim.cmd([[
   highlight ConflictTheirsMarker ctermbg=39
   highlight ConflictBase ctermbg=yellow
 ]])
+
+-- packadd
+vim.cmd.packadd('cfilter')

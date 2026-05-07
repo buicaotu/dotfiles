@@ -63,6 +63,12 @@ function M.diff_specific_commit(commit)
     command = 'git',
     args = { '-C', git_root, 'diff', commit, '--name-only' },
   })
+  if #list > 50 then
+    local answer = vim.fn.input(#list .. ' files changed. Continue? (y/n) ')
+    if answer ~= 'y' then
+      return
+    end
+  end
   local relative_list = {}
   for i, path in ipairs(list) do
     local abs_path = git_root .. '/' .. path
