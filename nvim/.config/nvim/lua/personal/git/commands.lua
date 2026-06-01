@@ -15,7 +15,6 @@ local function register_diff_commands()
     local base_ref = opts.args
     local start_target = (base_ref ~= nil and base_ref ~= '') and base_ref or 'origin/master'
     progress.run_with_progress(function(update_message)
-      diff.maybe_fetch_stale_origin_branch(start_target, update_message)
       local resolved_base = diff.find_merge_base(base_ref)
       diff.diff_specific_commit(resolved_base)
       update_message('Diff ready for ' .. start_target)

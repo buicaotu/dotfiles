@@ -5,11 +5,15 @@ return {
       enabled = false,
     },
     cli = {
+      watch = true,
       picker = 'fzf-lua',
       tools = {
         claude = {
           cmd = vim.g.claude_cmd or { "claude" },
         },
+      },
+      win = {
+        layout = "float",
       },
     },
   },
