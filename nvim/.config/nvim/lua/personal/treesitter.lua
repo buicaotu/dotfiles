@@ -4,6 +4,13 @@
 require('nvim-treesitter').setup {}
 require('nvim-treesitter').install({ 'typescript', 'tsx', 'json', 'java' })
 
+-- Replacement for the old `ensure_installed`. `install()` is idempotent
+-- (skips already-installed parsers) and runs async, so this is safe on startup.
+require('nvim-treesitter').install({
+  'java', 'javascript', 'json', 'kotlin', 'lua', 'markdown',
+  'markdown_inline', 'python', 'rust', 'tsx', 'typescript', 'yaml',
+})
+
 -- Treesitter indent (experimental) - enable for most filetypes except python/css
 vim.api.nvim_create_autocmd('FileType', {
   pattern = {
