@@ -251,8 +251,6 @@ vim.lsp.config('tsgo', {
   root_dir = ts_root_dir,
 })
 
--- Keep tsgo disabled by default; enable manually with vim.lsp.enable('tsgo')
-vim.lsp.enable('tsgo', false)
 vim.api.nvim_create_user_command("LspSwitchTs", function()
   local ts_ls_enabled = vim.lsp.is_enabled("ts_ls")
 
@@ -333,7 +331,7 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'ts_ls', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot' })
+vim.lsp.enable({ 'tsgo', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot' })
 
 -- CSS color preview via built-in LSP document_color (Neovim 0.12+)
 -- cssls provides textDocument/documentColor; render as virtual text swatches
