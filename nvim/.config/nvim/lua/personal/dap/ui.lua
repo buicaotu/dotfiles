@@ -16,9 +16,16 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close({})
 end
 
-local wk = require("which-key")
-wk.add({
-  { "<leader>du", require('dapui').toggle, desc = "Toggle DAP UI", mode = "n" },
-  { "<leader>de", require('dapui').eval, desc = "Eval under cursor", mode = { "n", "v" } },
-  { "<leader>dw", function() require('dapui').elements.watches.add(vim.fn.expand("<cexpr>")) end, desc = "Add to watch", mode = "n" },
-})
+local cmd = vim.api.nvim_create_user_command
+
+cmd("DapUiToggle", function()
+  require("dapui").toggle()
+end, { desc = "Toggle DAP UI" })
+
+cmd("DapUiEval", function()
+  require("dapui").eval()
+end, { range = true, desc = "Eval expression under cursor / selection" })
+
+cmd("DapUiWatch", function()
+  require("dapui").elements.watches.add(vim.fn.expand("<cexpr>"))
+end, { desc = "Add expression under cursor to watches" })

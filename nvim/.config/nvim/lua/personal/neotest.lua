@@ -49,12 +49,24 @@ neotest.setup({
   },
 })
 
-local wk = require("which-key")
-wk.add({
-  { "<leader>t", group = "Test" },
-  { "<leader>ts", function() neotest.summary.toggle() end, desc = "Toggle test summary", mode = "n" },
-  { "<leader>to", function() neotest.output.open({ enter = true }) end, desc = "Open test output", mode = "n" },
-  { "<leader>tt", function() neotest.run.run() end, desc = "Run nearest test", mode = "n" },
-  { "<leader>ta", function() neotest.run.run(vim.fn.expand("%")) end, desc = "Run all tests in file", mode = "n" },
-  { "<leader>td", function() neotest.run.run({ strategy = "dap" }) end, desc = "Debug nearest test", mode = "n" },
-})
+local cmd = vim.api.nvim_create_user_command
+
+cmd("TestRun", function()
+  neotest.run.run()
+end, { desc = "Run nearest test" })
+
+cmd("TestRunFile", function()
+  neotest.run.run(vim.fn.expand("%"))
+end, { desc = "Run all tests in file" })
+
+cmd("TestDebug", function()
+  neotest.run.run({ strategy = "dap" })
+end, { desc = "Debug nearest test" })
+
+cmd("TestSummary", function()
+  neotest.summary.toggle()
+end, { desc = "Toggle test summary" })
+
+cmd("TestOutput", function()
+  neotest.output.open({ enter = true })
+end, { desc = "Open test output" })

@@ -7,7 +7,7 @@ require "personal.dap.ui"
 -- Setup adapters
 require "personal.dap.adapters.js"
 
--- keymaps
+-- keymaps (F keys only; everything else is exposed as a user command)
 local wk = require("which-key")
 wk.add({
   { "<F8>", dap.continue, desc = "Continue", mode = "n" },
@@ -15,16 +15,23 @@ wk.add({
   { "<F10>", dap.step_into, desc = "Step into", mode = "n" },
   { "<F7>", dap.step_out, desc = "Step out", mode = "n" },
   { "<F5>", dap.toggle_breakpoint, desc = "Toggle breakpoint", mode = "n" },
-  { "<leader>B",  group = "Breakpoints" },
-  { "<leader>Bb", dap.toggle_breakpoint, desc = "Toggle breakpoint", mode = "n" },
-  { "<leader>Bx", dap.clear_breakpoints, desc = "Clear all breakpoints", mode = "n" },
-  {
-    "<leader>BB",
-    function()
-      dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
-    end,
-    desc = "Conditional breakpoint",
-    mode = "n",
-  },
-  { "<leader>Br", dap.run_to_cursor, desc = "Run to cursor", mode = "n" },
 })
+
+-- User commands.
+-- Note: nvim-dap already ships :DapContinue, :DapStepOver/Into/Out,
+-- :DapToggleBreakpoint, :DapClearBreakpoints, :DapTerminate, :DapEval, etc.
+-- so we only add commands for the actions that lack a built-in.
+local cmd = vim.api.nvim_create_user_command
+
+cmd("DapBreakpointCondition", function()
+  dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "Set a conditional breakpoint" })
+
+cmd("DapRunToCursor", dap.run_to_cursor, { desc = "Run to cursor" })
+
+-- "Undo" the step-through: move the execution point to the cursor line
+-- without running the code in between (DAP `goto`/set-next-statement).
+-- Requires adapter support (capabilities.supportsGotoTargetsRequest).
+cmd("DapGotoCursor", function()
+  dap.goto_()
+end, { desc = "Move execution point to cursor line" })
