@@ -4,13 +4,18 @@ local M = {}
 --
 -- Native vim diff applies DiffAdd/DiffChange/DiffText symmetrically to both
 -- windows, so a changed line looks identical (red) on both sides. Here we
--- remap those groups per-window via `winhighlight`: the left (old) window
--- becomes all-red, the right (new) window all-green. Filler stays neutral.
+-- remap those groups per-window via `winhighlight`: the old window becomes
+-- all-red, the new window all-green. Filler stays neutral.
 --
--- This relies on the fugitive workflow opening the OLD revision on the LEFT
--- and the current/NEW revision on the RIGHT (Gvdiffsplit!). Directional
--- coloring is only applied to a clean 2-way split; anything else (e.g. a
--- 3-way mergetool) falls back to the colorscheme defaults.
+-- Each diff window's side (old/new) is resolved, in priority order:
+--   1. an explicit manual designation (w:diff_side = 'old' | 'new' | 'off'),
+--      set by :Diffthisold/:Diffthisnew/:DiffHl* below;
+--   2. fugitive: the `fugitive://` buffer is always the OLD revision (this is
+--      how :Gdiffsplit/:Gvdiffsplit open the prior version), so its window is
+--      old and every other diff window is new;
+--   3. fallback: in a clean 2-way split the leftmost window is old.
+-- If none of these decide a window (e.g. a 3-way mergetool with no fugitive
+-- buffer), it is left at the colorscheme default.
 
 -- The red/green tones are pulled from the vscode theme (incl. the
 -- color_overrides set in lua/plugins/vscode.lua) so directional diffs match
@@ -52,10 +57,66 @@ end
 local OLD_WINHL = 'DiffAdd:DiffAddOld,DiffChange:DiffChangeOld,DiffText:DiffTextOld'
 local NEW_WINHL = 'DiffAdd:DiffAddNew,DiffChange:DiffChangeNew,DiffText:DiffTextNew'
 
+local WINHL_FOR = { old = OLD_WINHL, new = NEW_WINHL }
+
+local function manual_side(win)
+  local ok, side = pcall(vim.api.nvim_win_get_var, win, 'diff_side')
+  if ok and (side == 'old' or side == 'new' or side == 'off') then
+    return side
+  end
+  return nil
+end
+
+local function is_fugitive_win(win)
+  local name = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+  return name:match('^fugitive://') ~= nil
+end
+
+-- Resolve each diff window to 'old' / 'new' / 'off' / nil. 'off' and nil are
+-- both left uncolored; 'off' additionally means "decided" so it is never
+-- inferred to the opposite side.
+local function resolve_sides(diff_wins)
+  local sides = {}
+  local has_old, has_new = false, false
+
+  for _, dw in ipairs(diff_wins) do
+    local side = manual_side(dw.win)
+    if not side and is_fugitive_win(dw.win) then
+      side = 'old'
+    end
+    sides[dw.win] = side
+    if side == 'old' then
+      has_old = true
+    elseif side == 'new' then
+      has_new = true
+    end
+  end
+
+  -- An 'old' anchor (fugitive or manual) makes the rest new, and vice versa.
+  -- 'old' wins ties so a fugitive revision always reads as red.
+  local fill = has_old and 'new' or has_new and 'old' or nil
+  if fill then
+    for _, dw in ipairs(diff_wins) do
+      if not sides[dw.win] then
+        sides[dw.win] = fill
+      end
+    end
+    return sides
+  end
+
+  -- No anchor: fall back to column position, but only for a clean 2-way split.
+  if #diff_wins == 2 and not sides[diff_wins[1].win] and not sides[diff_wins[2].win] then
+    local sorted = { diff_wins[1], diff_wins[2] }
+    table.sort(sorted, function(a, b) return a.col < b.col end)
+    sides[sorted[1].win] = 'old'
+    sides[sorted[2].win] = 'new'
+  end
+  return sides
+end
+
 local function apply()
   local tabwins = vim.api.nvim_tabpage_list_wins(0)
 
-  -- Collect diff windows with their screen column (leftmost = old).
   local diff_wins = {}
   for _, win in ipairs(tabwins) do
     if vim.wo[win].diff then
@@ -64,18 +125,9 @@ local function apply()
     end
   end
 
-  -- Only a clean 2-way split gets directional coloring.
-  local directional = #diff_wins == 2
-  if directional then
-    table.sort(diff_wins, function(a, b) return a.col < b.col end)
-  end
-
-  for i, dw in ipairs(diff_wins) do
-    local target = ''
-    if directional then
-      target = (i == 1) and OLD_WINHL or NEW_WINHL
-    end
-    vim.wo[dw.win].winhighlight = target
+  local sides = resolve_sides(diff_wins)
+  for _, dw in ipairs(diff_wins) do
+    vim.wo[dw.win].winhighlight = WINHL_FOR[sides[dw.win]] or ''
   end
 
   -- Strip our mappings from windows that have left diff mode.
@@ -89,20 +141,30 @@ local function apply()
   end
 end
 
--- Manually force the current window's diff coloring (overrides the automatic
--- position-based assignment until the next DiffUpdated). Useful when the
--- old/new sides are reversed, or in layouts the auto logic skips (e.g. a
--- 3-way mergetool).
-function M.set_old()
-  vim.wo.winhighlight = OLD_WINHL
+-- Pin the current window's side. The designation persists (survives
+-- DiffUpdated) until changed or the window leaves diff mode.
+local function designate(side)
+  vim.api.nvim_win_set_var(0, 'diff_side', side)
+  apply()
 end
 
-function M.set_new()
-  vim.wo.winhighlight = NEW_WINHL
+function M.set_old() designate('old') end
+
+function M.set_new() designate('new') end
+
+-- 'off' pins the window to no coloring (so auto-detection won't re-color it).
+function M.clear() designate('off') end
+
+-- :diffthis on the current window, pinned to a side. For manual two-file
+-- diffs where neither buffer is a fugitive revision.
+function M.diffthis_old()
+  vim.cmd('diffthis')
+  designate('old')
 end
 
-function M.clear()
-  vim.wo.winhighlight = ''
+function M.diffthis_new()
+  vim.cmd('diffthis')
+  designate('new')
 end
 
 function M.setup()
@@ -111,11 +173,15 @@ function M.setup()
   define_highlights()
 
   vim.api.nvim_create_user_command('DiffHlOld', M.set_old,
-    { desc = 'Apply old-file (red) diff highlight to current window' })
+    { desc = 'Pin current window to old-file (red) diff highlight' })
   vim.api.nvim_create_user_command('DiffHlNew', M.set_new,
-    { desc = 'Apply new-file (green) diff highlight to current window' })
+    { desc = 'Pin current window to new-file (green) diff highlight' })
   vim.api.nvim_create_user_command('DiffHlClear', M.clear,
-    { desc = 'Clear custom diff highlight on current window' })
+    { desc = 'Pin current window to no diff highlight' })
+  vim.api.nvim_create_user_command('Diffthisold', M.diffthis_old,
+    { desc = 'diffthis on current window, pinned as old (red)' })
+  vim.api.nvim_create_user_command('Diffthisnew', M.diffthis_new,
+    { desc = 'diffthis on current window, pinned as new (green)' })
 
   -- Re-define our groups whenever the colorscheme reloads.
   vim.api.nvim_create_autocmd('ColorScheme', {
