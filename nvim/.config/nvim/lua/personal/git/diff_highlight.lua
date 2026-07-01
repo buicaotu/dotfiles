@@ -130,15 +130,36 @@ local function apply()
     vim.wo[dw.win].winhighlight = WINHL_FOR[sides[dw.win]] or ''
   end
 
-  -- Strip our mappings from windows that have left diff mode.
+  -- Strip our mappings AND the pinned side from windows that have left diff
+  -- mode, so a window reused for a later diff auto-detects from scratch rather
+  -- than carrying a stale 'old'/'new'/'off' designation.
   for _, win in ipairs(tabwins) do
     if not vim.wo[win].diff then
+      pcall(vim.api.nvim_win_del_var, win, 'diff_side')
       local cur = vim.wo[win].winhighlight
       if cur == OLD_WINHL or cur == NEW_WINHL then
         vim.wo[win].winhighlight = ''
       end
     end
   end
+end
+
+-- Hard reset: wipe our per-window state (winhighlight + pinned side) across
+-- every window in every tab, rebuild the highlight groups, then re-apply for
+-- whatever is still in diff mode. Use when colors get stuck and DiffHlClear /
+-- reopening the diff doesn't recover.
+function M.reset()
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      pcall(vim.api.nvim_win_del_var, win, 'diff_side')
+      local cur = vim.wo[win].winhighlight
+      if cur == OLD_WINHL or cur == NEW_WINHL then
+        vim.wo[win].winhighlight = ''
+      end
+    end
+  end
+  define_highlights()
+  apply()
 end
 
 -- Pin the current window's side. The designation persists (survives
@@ -178,6 +199,8 @@ function M.setup()
     { desc = 'Pin current window to new-file (green) diff highlight' })
   vim.api.nvim_create_user_command('DiffHlClear', M.clear,
     { desc = 'Pin current window to no diff highlight' })
+  vim.api.nvim_create_user_command('DiffHlReset', M.reset,
+    { desc = 'Wipe all diff-highlight state across every window and re-apply' })
   vim.api.nvim_create_user_command('Diffthisold', M.diffthis_old,
     { desc = 'diffthis on current window, pinned as old (red)' })
   vim.api.nvim_create_user_command('Diffthisnew', M.diffthis_new,
