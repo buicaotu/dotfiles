@@ -17,6 +17,13 @@ local function get_non_terminal_buffers()
   return result
 end
 
+-- Delete a buffer with :bdelete (unlists but keeps the buffer record).
+-- Avoid nvim_buf_delete: it defaults to :bwipeout, which destroys the buffer
+-- entirely and invalidates quickfix/loclist/mark references to it.
+local function bdelete(buf, force)
+  vim.cmd(("silent! bdelete%s %d"):format(force and "!" or "", buf))
+end
+
 -- Function to close a buffer with confirmation if modified
 local function close_buffer_with_confirm(buf)
   -- Check if buffer is modified
@@ -29,17 +36,17 @@ local function close_buffer_with_confirm(buf)
     local choice = vim.fn.confirm("Save changes to " .. bufname .. "?", "&Yes\n&No\n&Cancel", 1)
     if choice == 1 then -- Yes
       vim.api.nvim_buf_call(buf, function() vim.cmd("silent! w") end)
-      vim.api.nvim_buf_delete(buf, {})
+      bdelete(buf, false)
       return true
     elseif choice == 2 then -- No
-      vim.api.nvim_buf_delete(buf, { force = true })
+      bdelete(buf, true)
       return true
     elseif choice == 3 then -- Cancel
       return false          -- Operation cancelled
     end
   else
     -- Not modified, just delete
-    vim.api.nvim_buf_delete(buf, {})
+    bdelete(buf, false)
     return true
   end
 end
