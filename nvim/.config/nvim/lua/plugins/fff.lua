@@ -1,4 +1,23 @@
 -- fff.nvim — Rust-backed file index with its own grouped grep/file picker UI.
+
+-- When invoked from an oil buffer, scope the picker to that buffer's
+-- directory (mirrors how :Rg behaves in oil). Merges any extra opts so
+-- callers can still pass grep modes etc. Returns opts unchanged elsewhere.
+-- Also closes a floating oil window so the picker isn't stacked on top of it.
+local function with_oil_cwd(extra)
+  local opts = extra or {}
+  if vim.bo.filetype == "oil" then
+    local ok, oil = pcall(require, "oil")
+    if ok then
+      opts.cwd = oil.get_current_dir()
+      if vim.api.nvim_win_get_config(0).relative ~= "" then
+        oil.close()
+      end
+    end
+  end
+  return opts
+end
+
 return {
   "dmtrKovalenko/fff.nvim",
   build = function()
@@ -33,10 +52,10 @@ return {
     end, { desc = "fff find files" })
   end,
   keys = {
-    { "<leader>ff", function() require('fff').find_files() end, desc = 'FFFind files' },
-    { "<leader>fg", function() require('fff').live_grep() end, desc = 'LiFFFe grep' },
+    { "<leader>ff", function() require('fff').find_files(with_oil_cwd()) end, desc = 'FFFind files' },
+    { "<leader>fg", function() require('fff').live_grep(with_oil_cwd()) end, desc = 'LiFFFe grep' },
     { "<leader>fz",
-      function() require('fff').live_grep({ grep = { modes = { 'fuzzy', 'plain' } } }) end,
+      function() require('fff').live_grep(with_oil_cwd({ grep = { modes = { 'fuzzy', 'plain' } } })) end,
       desc = 'Live fffuzy grep',
     },
     { "<leader>fw",
