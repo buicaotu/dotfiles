@@ -3,6 +3,8 @@ return {
   name = "greview",
   lazy = false,
   config = function()
-    require("greview").setup()
+    require("greview").setup({
+      log_level = "debug",
+    })
   end,
 }
