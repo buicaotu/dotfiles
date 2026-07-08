@@ -1,5 +1,6 @@
 return {
   "folke/snacks.nvim",
+  lazy = false,
   opts = {
     scope = {
       keys = {
@@ -40,6 +41,7 @@ return {
     },
     bigfile = {},
     image = {},
+    input = {},
     terminal = {
       win = {
         keys = {
