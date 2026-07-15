@@ -67,7 +67,6 @@ return {
   { 'echasnovski/mini.move', version = false, opts = {} },
 
   -- Editing
-  { "tpope/vim-surround" },
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",

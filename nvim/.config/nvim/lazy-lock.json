@@ -13,6 +13,7 @@
   "dprint-vim-plugin": { "branch": "master", "commit": "c1b3d20794342e74de50df948ee6badbf65ffa8a" },
   "fff.nvim": { "branch": "main", "commit": "0c40be4a4d80ad25193d854a949c9dab8521e26b" },
   "fidget.nvim": { "branch": "main", "commit": "889e2e96edef4e144965571d46f7a77bcc4d0ddf" },
+  "flash.nvim": { "branch": "main", "commit": "b6346946d10d07998efee029fb0f7a593806d0cd" },
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
   "fzf-lua": { "branch": "main", "commit": "9f0432fdd7825ab163520045831a40b6df82ea28" },
   "indent-blankline.nvim": { "branch": "master", "commit": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03" },
