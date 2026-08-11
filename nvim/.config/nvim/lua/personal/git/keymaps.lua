@@ -51,14 +51,13 @@ local function register_keymaps()
   local diff_move = make_diff_moves()
   wk.add({
     { "<leader>d",  group = "Diff/Debug" },
-    { "<leader>dt", ':G! difftool --name-only<CR>', desc = "Difftool (working dir)", mode = "n" },
+    { "<leader>dt", diff.diff_working_tree, desc = "Difftool (working dir)", mode = "n" },
     {
       "<leader>Dt",
       function()
         local commit = vim.fn.input("Commit: ")
-        diff.set_current_commit(commit)
         if commit ~= "" then
-          vim.cmd('G! difftool --name-only ' .. commit)
+          diff.diff_specific_commit(commit)
         end
       end,
       desc = "Difftool (specific commit)",
