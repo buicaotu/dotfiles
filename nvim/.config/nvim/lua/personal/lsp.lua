@@ -331,7 +331,7 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'tsgo', 'denols', 'eslint', 'efm', 'lua_ls', 'jdtls', 'cssls', 'copilot' })
+vim.lsp.enable({ 'tsgo', 'denols', 'eslint', 'efm', 'lua_ls','cssls', 'copilot' })
 
 -- CSS color preview via built-in LSP document_color (Neovim 0.12+)
 -- cssls provides textDocument/documentColor; render as virtual text swatches

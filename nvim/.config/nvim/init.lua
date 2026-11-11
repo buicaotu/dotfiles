@@ -11,8 +11,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Load work configuration from Lua file
-local work_config_path = vim.fn.stdpath("config") .. "/.work-config.lua"
+-- Load work configuration from env Lua file
+local work_config_path = vim.fn.stdpath("config") .. "/.env.lua"
 local ok, work_config = pcall(function()
   return loadfile(work_config_path)()
 end)

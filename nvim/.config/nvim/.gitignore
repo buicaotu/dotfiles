@@ -45,4 +45,4 @@ luac.out
 session.vim
 
 # Work environment configuration
-.work-config.lua
+.env.lua
