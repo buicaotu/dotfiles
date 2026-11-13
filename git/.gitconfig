@@ -27,6 +27,7 @@
   cg = "! git fetch origin refs/heads/master && git switch -q -C $1 FETCH_HEAD #" # create a new branch off master
   pf = "! git push --force-with-lease #" # push force
   pu = "! git push -u #" # push upstream with default (default is current see push config below)
+  pp = "! git pull origin $(git branch --show-current) #" # pull only the current branch (fetches just that ref)
   l  = "! git log --pretty=format:'%C(Yellow)%h %C(cyan)%cs %Cgreen%<(10,trunc)%al%x09%Creset%s %Cred%D' $@ #" # log <commit> <date> <name> <comment>
   lv  = "! git l -n5 --first-parent $@ #"
   lx  = "! git l -n10 --first-parent $@ #"
