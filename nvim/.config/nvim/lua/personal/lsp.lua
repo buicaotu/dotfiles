@@ -331,7 +331,13 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.enable({ 'tsgo', 'denols', 'eslint', 'efm', 'lua_ls','cssls', 'copilot' })
+vim.lsp.enable({ 'tsgo', 'denols', 'eslint', 'efm', 'lua_ls', 'cssls', 'copilot' })
+
+-- Java LSP is picked by java_lsp in .env.lua: "jdtls" here; "expresso" and
+-- "intellij" are plugins (lua/plugins/expresso.lua, intellij-lsp.lua).
+if vim.g.java_lsp == 'jdtls' then
+  vim.lsp.enable('jdtls')
+end
 
 -- CSS color preview via built-in LSP document_color (Neovim 0.12+)
 -- cssls provides textDocument/documentColor; render as virtual text swatches

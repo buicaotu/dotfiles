@@ -23,8 +23,8 @@ return {
   build = function()
     require("fff.download").download_or_build_binary()
   end,
+  enabled = vim.g.enable_fff ~= false, -- set enable_fff = false in .env.lua to turn off
   lazy = false, -- keep the index warm so :RR is instant
-  enabled = false,
   opts = {
     layout = {
       -- fzf-lua style: prompt on top, best match first (top-down) instead of
