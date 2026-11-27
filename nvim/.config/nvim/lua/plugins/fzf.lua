@@ -146,6 +146,14 @@ return {
         mode = "n",
       },
       {
+        "<leader><leader>s",
+        function()
+          vim.cmd.Directories()
+        end,
+        desc = "Find directories",
+        mode = "n",
+      },
+      {
         "<C-p>",
         function()
           vim.cmd.FzfLua('buffers')

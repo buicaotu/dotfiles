@@ -11,6 +11,7 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     build = ':TSUpdate',
     init = function()
       -- Queries moved to runtime/queries/ in the main branch rewrite,
